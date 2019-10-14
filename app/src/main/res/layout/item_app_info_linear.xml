@@ -9,8 +9,8 @@
     android:layout_marginRight="10dp"
     android:layout_marginBottom="5dp"
     app:cardBackgroundColor="@color/colorCardArea"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="3dp">
+    app:cardCornerRadius="2dp"
+    app:cardElevation="2dp">
 
     <RelativeLayout
         android:id="@+id/item_app_root"

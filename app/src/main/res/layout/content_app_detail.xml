@@ -76,7 +76,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:src="@drawable/icon_play"/>
+                        android:src="@drawable/ic_play_arrow_green_600_36dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -674,7 +674,7 @@
                         android:layout_centerVertical="true"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="15dp"
-                        android:src="@drawable/arrow"/>
+                        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
                     <TextView
                         android:id="@+id/app_detail_permission_area_att"
                         android:layout_width="wrap_content"
@@ -731,7 +731,7 @@
                         android:layout_centerVertical="true"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="15dp"
-                        android:src="@drawable/arrow"/>
+                        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
                     <TextView
                         android:id="@+id/app_detail_activity_area_att"
                         android:layout_width="wrap_content"
@@ -788,7 +788,7 @@
                         android:layout_centerVertical="true"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="15dp"
-                        android:src="@drawable/arrow"/>
+                        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
                     <TextView
                         android:id="@+id/app_detail_receiver_area_att"
                         android:layout_width="wrap_content"
@@ -845,7 +845,7 @@
                         android:layout_centerVertical="true"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="15dp"
-                        android:src="@drawable/arrow"/>
+                        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
                     <TextView
                         android:id="@+id/app_detail_static_loader_area_att"
                         android:layout_width="wrap_content"

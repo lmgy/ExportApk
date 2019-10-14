@@ -6,31 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.lmgy.exportapk.ui.MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <include layout="@layout/content_main" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:visibility="gone"
-        app:srcCompat="@android:drawable/ic_dialog_info" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/main_card"
         android:layout_width="wrap_content"
@@ -64,9 +39,9 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
+                    android:text="@string/main_card_show_system_app"
                     android:textColor="@color/colorHighLightText"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_show_system_app" />
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/main_storage_remain"
@@ -77,9 +52,9 @@
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
+                    android:text="@string/main_card_remaining_storage"
                     android:textColor="@color/colorHighLightText"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_remaining_storage" />
+                    android:textSize="13sp" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -120,8 +95,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:singleLine="true"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_multi_select_select_all" />
+                    android:text="@string/main_card_multi_select_select_all"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/main_deselect_all"
@@ -131,8 +106,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:singleLine="true"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_multi_select_deselect_all" />
+                    android:text="@string/main_card_multi_select_deselect_all"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/main_export"
@@ -143,8 +118,8 @@
                     android:ellipsize="end"
                     android:focusable="true"
                     android:singleLine="true"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_multi_select_export" />
+                    android:text="@string/main_card_multi_select_export"
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/main_share"
@@ -155,8 +130,8 @@
                     android:ellipsize="end"
                     android:focusable="true"
                     android:singleLine="true"
-                    android:textSize="13sp"
-                    tools:text="@string/main_card_multi_select_share" />
+                    android:text="@string/main_card_multi_select_share"
+                    android:textSize="13sp" />
 
             </LinearLayout>
 
@@ -173,5 +148,30 @@
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/ic_dialog_info" />
+
+    <include layout="@layout/content_main" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

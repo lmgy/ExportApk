@@ -17,4 +17,5 @@
         android:textColor="@color/color_text_normal"
         android:textSize="14sp"
         tools:text="Android Single TextView" />
+
 </RelativeLayout>

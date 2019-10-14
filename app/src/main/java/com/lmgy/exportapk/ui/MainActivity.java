@@ -109,10 +109,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             int submitId = searchView.getContext().getResources().getIdentifier("android:id/submit_area", null, null);
             int textId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
             int closeId = searchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
-            ((ImageView) searchView.findViewById(imgId)).setImageResource(R.drawable.icon_search);
+            ((ImageView) searchView.findViewById(imgId)).setImageResource(R.drawable.ic_search_white_24dp);
             ((TextView) searchView.findViewById(textId)).setTextColor(getResources().getColor(R.color.colorHighLightTextDarkBackground));
             ((TextView) searchView.findViewById(textId)).setHintTextColor(getResources().getColor(R.color.colorDividingLine));
-            ((ImageView) searchView.findViewById(closeId)).setImageResource(R.drawable.icon_close);
+            ((ImageView) searchView.findViewById(closeId)).setImageResource(R.drawable.ic_clear_white_24dp);
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
