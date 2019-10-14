@@ -166,11 +166,5 @@
     <b>新增：夜间黑色主题适配；</b>\n
     <b>改动：搜索模式下可以进行多选操作；</b>\n
     <b>新增：权限(uses-permission)，活动组件(activity)，广播接收器(Receiver)查看功能；</b>\n\n
-
-        开源地址:\n
-         https://github.com/ghmxr/apkextractor \n\n
-        邮箱: \n
-        mxremail@qq.com \n\n
-        打赏作者：
         </string>
 </resources>

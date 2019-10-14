@@ -45,6 +45,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author lmgy
+ * @date 2019/10/13
+ */
 public class AppDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private AppItemBean appItem;
