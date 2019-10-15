@@ -1,8 +1,6 @@
 package com.lmgy.exportapk.config
 
-import androidx.appcompat.app.AppCompatDelegate
-
-import com.lmgy.exportapk.utils.Storage
+import com.lmgy.exportapk.utils.StorageUtils
 
 /**
  * @author lmgy
@@ -49,42 +47,60 @@ object Constant {
             "android.permission.RECEIVE_SMS",
             "android.permission.RECEIVE_WAP_PUSH")
 
+    /**
+     * this preference stands for a string value;
+     */
     val PREFERENCE_NAME = "settings"
+    /**
+     * this preference stands for a string value;
+     */
     val PREFERENCE_SAVE_PATH = "savepath"
-    val PREFERENCE_SAVE_PATH_DEFAULT = Storage.getMainExternalStoragePath() + "/Backup"
+    val PREFERENCE_SAVE_PATH_DEFAULT = StorageUtils.getMainStoragePath() + "/Backup"
+    /**
+     * this preference stands for a string value;
+     */
     val PREFERENCE_STORAGE_PATH = "storage_path"
-    val PREFERENCE_STORAGE_PATH_DEFAULT = Storage.getMainExternalStoragePath()
+    val PREFERENCE_STORAGE_PATH_DEFAULT = StorageUtils.getMainStoragePath()
+    /**
+     * this preference stands for a string value;
+     */
     val PREFERENCE_FILENAME_FONT_APK = "font_apk"
+    /**
+     * this preference stands for a string value;
+     */
     val PREFERENCE_FILENAME_FONT_ZIP = "font_zip"
+    /**
+     * this preference stands for a int value;
+     */
     val PREFERENCE_ZIP_COMPRESS_LEVEL = "zip_level"
     val PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT = -1
+    /**
+     * this preference stands for a int value;
+     */
     val PREFERENCE_SHAREMODE = "share_mode"
+    /**
+     * this preference stands for a int value;
+     */
     val PREFERENCE_SORT_CONFIG = "sort_config"
-    val PREFERENCE_MAIN_PAGE_VIEW_MODE = "main_view_mode"
-    val PREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT = 0
+    /**
+     * this preference stands for a boolean value;
+     */
     val PREFERENCE_SHOW_SYSTEM_APP = "show_system_app"
-    val PREFERENCE_SHOW_SYSTEM_APP_DEFAULT = false
-    val PREFERENCE_LOAD_PERMISSIONS = "load_permissions"
-    val PREFERENCE_LOAD_ACTIVITIES = "load_activities"
-    val PREFERENCE_LOAD_RECEIVERS = "load_receivers"
-    val PREFERENCE_LOAD_STATIC_LOADERS = "load_static_receivers"
-    val PREFERENCE_NIGHT_MODE = "night_mode"
-    val PREFERENCE_NIGHT_MODE_DEFAULT = AppCompatDelegate.MODE_NIGHT_NO
-    val PREFERENCE_LOAD_PERMISSIONS_DEFAULT = true
-    val PREFERENCE_LOAD_ACTIVITIES_DEFAULT = true
-    val PREFERENCE_LOAD_RECEIVERS_DEFAULT = true
-    val PREFERENCE_LOAD_STATIC_LOADERS_DEFAULT = false
+
     val SHARE_MODE_DIRECT = -1
     val SHARE_MODE_AFTER_EXTRACT = 0
     val PREFERENCE_SHAREMODE_DEFAULT = SHARE_MODE_DIRECT
+
     val FONT_APP_NAME = "?N"
     val FONT_APP_PACKAGE_NAME = "?P"
     val FONT_APP_VERSIONCODE = "?C"
     val FONT_APP_VERSIONNAME = "?V"
+
     val ZIP_LEVEL_STORED = 0
     val ZIP_LEVEL_LOW = 1
     val ZIP_LEVEL_NORMAL = 5
     val ZIP_LEVEL_HIGH = 9
+
     val PREFERENCE_FILENAME_FONT_DEFAULT = "$FONT_APP_PACKAGE_NAME-$FONT_APP_VERSIONCODE"
 
 }

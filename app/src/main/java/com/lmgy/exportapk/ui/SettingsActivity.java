@@ -22,7 +22,6 @@ import com.lmgy.exportapk.Global;
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.config.Constant;
-import com.lmgy.exportapk.widget.ExportRuleDialog;
 
 /**
  * @author lmgy

@@ -2,22 +2,12 @@ package com.lmgy.exportapk.utils
 
 import android.content.Context
 import android.os.Message
-import android.telephony.mbms.FileInfo
-
-import com.lmgy.exportapk.Global
 import com.lmgy.exportapk.R
 import com.lmgy.exportapk.base.BaseActivity
 import com.lmgy.exportapk.bean.AppItemBean
 import com.lmgy.exportapk.config.Constant
-
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.util.ArrayList
+import java.io.*
+import java.util.*
 import java.util.zip.CRC32
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -26,7 +16,8 @@ import java.util.zip.ZipOutputStream
  * @author lmgy
  * @date 2019/10/13
  */
-class ExportTask(var appList: List<AppItemBean>, private val context: Context) : Runnable {
+class ExportTask(private var appList: List<AppItemBean>, private val context: Context) : Runnable {
+
     private val savePath = BaseActivity.savePath
     private var currentWritePath: String? = null
     private var isInterrupted = false
@@ -44,10 +35,10 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
             for ((_, packageName, _, appSize, _, _, _, _, _, exportData, exportObb) in appList) {
                 total += appSize
                 if (exportData) {
-                    total += FileSize.getFileOrFolderSize(File(StorageUtils.getMainStoragePath() + "/android/data/" + packageName))
+                    total += FileUtils.getFileOrFolderSize(File(StorageUtils.getMainStoragePath() + "/android/data/" + packageName))
                 }
                 if (exportObb) {
-                    total += FileSize.getFileOrFolderSize(File(StorageUtils.getMainStoragePath() + "/android/obb/" + packageName))
+                    total += FileUtils.getFileOrFolderSize(File(StorageUtils.getMainStoragePath() + "/android/obb/" + packageName))
                 }
             }
             return total
@@ -77,26 +68,26 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
                 msgCurrentApp.obj = Integer.valueOf(i)
                 Main.sendMessage(msgCurrentApp)
                 if (!item.exportData && !item.exportObb) {
-                    var byteread: Int
+                    var byteRead: Int
                     try {
-                        val writePath = FileUtils.getAbsoluteWritePath(context, item, "apk")
+                        val writePath = FileInfo.getAbsoluteWritePath(context, item, "apk")
                         this.currentWritePath = writePath
-                        val `in` = FileInputStream(item.getResourcePath())
+                        val inputStream = FileInputStream(item.path)
                         val out = BufferedOutputStream(FileOutputStream(writePath))
-                        val msgCurrentfile = Message()
-                        msgCurrentfile.what = BaseActivity.MESSAGE_COPYFILE_CURRENTFILE
+                        val msgCurrentFile = Message()
+                        msgCurrentFile.what = BaseActivity.MESSAGE_COPYFILE_CURRENTFILE
                         var sendPath = writePath
                         if (sendPath.length > 90) {
                             sendPath = "..." + sendPath.substring(sendPath.length - 90)
                         }
-                        msgCurrentfile.obj = context.resources.getString(R.string.copytask_apk_current) + sendPath
-                        BaseActivity.sendMessage(msgCurrentfile)
+                        msgCurrentFile.obj = context.resources.getString(R.string.copytask_apk_current) + sendPath
+                        BaseActivity.sendMessage(msgCurrentFile)
 
                         val buffer = ByteArray(1024 * 10)
-                        while ((byteread = `in`.read(buffer)) != -1 && !this.isInterrupted) {
-                            out.write(buffer, 0, byteread)
-                            progress += byteread.toLong()
-                            bytesPerSecond += byteread.toLong()
+                        while (inputStream.read(buffer).also { byteRead = it } != -1 && !this.isInterrupted) {
+                            out.write(buffer, 0, byteRead)
+                            progress += byteRead.toLong()
+                            bytesPerSecond += byteRead.toLong()
                             val endTime = System.currentTimeMillis()
                             if (endTime - startTime > 1000) {
                                 startTime = endTime
@@ -111,9 +102,9 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
                             if (progress - bytetemp > 100 * 1024) {
                                 bytetemp = progress
                                 val msgProgress = Message()
-                                val progressinfo = arrayOf(java.lang.Long.valueOf(progress), java.lang.Long.valueOf(total))
+                                val progressInfo = arrayOf(java.lang.Long.valueOf(progress), java.lang.Long.valueOf(total))
                                 msgProgress.what = BaseActivity.MESSAGE_COPYFILE_REFRESH_PROGRESS
-                                msgProgress.obj = progressinfo
+                                msgProgress.obj = progressInfo
                                 BaseActivity.sendMessage(msgProgress)
                             }
 
@@ -121,7 +112,7 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
                         out.flush()
                         `in`.close()
                         out.close()
-                        writePaths.add(writepath)
+                        writePaths.add(writePath)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         try {
@@ -153,7 +144,7 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
                             zos.setLevel(zipLevel)
                         }
 
-                        writeZip(File(item.getResourcePath()), "", zos, zipLevel)
+                        writeZip(File(item.path), "", zos, zipLevel)
                         if (item.exportData) {
                             writeZip(File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName), "Android/data/", zos, zip_level)
                         }
@@ -296,7 +287,7 @@ class ExportTask(var appList: List<AppItemBean>, private val context: Context) :
             val crc = CRC32()
             val bytes = ByteArray(1024)
             var cnt: Int
-            while ((cnt = inputStream.read(bytes)) != -1) {
+            while (inputStream.read(bytes).also { cnt = it } != -1) {
                 crc.update(bytes, 0, cnt)
             }
             inputStream.close()
