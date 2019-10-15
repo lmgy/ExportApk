@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.lmgy.exportapk.Global;
 import com.lmgy.exportapk.R;
-import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.Storage;
 
@@ -64,8 +63,8 @@ public class DataObbDialog extends AlertDialog implements View.OnClickListener {
             synchronized (DataObbDialog.this) {
                 long data = 0, obb = 0;
                 for (AppItemBean item : list) {
-                    long data_item = FileUtils.getFileOrFolderSize(new File(Storage.getMainExternalStoragePath() + "/android/data/" + item.getPackageName()));
-                    long obb_item = FileUtils.getFileOrFolderSize(new File(Storage.getMainExternalStoragePath() + "/android/obb/" + item.getPackageName()));
+                    long data_item = FileUtils.INSTANCE.getFileOrFolderSize(new File(Storage.INSTANCE.getMainExternalStoragePath() + "/android/data/" + item.getPackageName()));
+                    long obb_item = FileUtils.INSTANCE.getFileOrFolderSize(new File(Storage.INSTANCE.getMainExternalStoragePath() + "/android/obb/" + item.getPackageName()));
                     data += data_item;
                     obb += obb_item;
                     if (data > 0) {

@@ -96,7 +96,7 @@ public class EnvironmentUtils {
     public static HashMap<String, List<String>> getStaticRegisteredReceiversForPackageName(@NonNull Context context, @NonNull String packageName) {
         HashMap<String, List<String>> map = new HashMap<>();
         PackageManager packageManager = context.getPackageManager();
-        String[] staticFilters = Constant.staticFilters;
+        String[] staticFilters = Constant.INSTANCE.getStaticFilters();
         for (String s : staticFilters) {
             List<ResolveInfo> list = packageManager.queryBroadcastReceivers(new Intent(s), 0);
             for (ResolveInfo info : list) {
@@ -126,11 +126,11 @@ public class EnvironmentUtils {
     public static Bundle getStaticRegisteredReceiversOfBundleTypeForPackageName(@NonNull Context context, @NonNull String packageName) {
         Bundle bundle = new Bundle();
         if (!Global.getGlobalSharedPreferences(context)
-                .getBoolean(Constant.PREFERENCE_LOAD_STATIC_LOADERS, Constant.PREFERENCE_LOAD_STATIC_LOADERS_DEFAULT)) {
+                .getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS(), Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS_DEFAULT())) {
             return bundle;
         }
         PackageManager packageManager = context.getPackageManager();
-        String[] staticFilters = Constant.staticFilters;
+        String[] staticFilters = Constant.INSTANCE.getStaticFilters();
 
         for (String s : staticFilters) {
             List<ResolveInfo> list = packageManager.queryBroadcastReceivers(new Intent(s), 0);

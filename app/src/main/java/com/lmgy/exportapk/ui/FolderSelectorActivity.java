@@ -51,7 +51,7 @@ public class FolderSelectorActivity extends BaseActivity {
     private TextView textView;
     private String currentStoragePath;
 
-    private final List<String> storages = Storage.getAvailableStoragePaths();
+    private final List<String> storages = Storage.INSTANCE.getAvailableStoragePaths();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class FolderSelectorActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         settings = Global.getGlobalSharedPreferences(this);
-        file = new File(settings.getString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT));
+        file = new File(settings.getString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT()));
         currentStoragePath = getStoragePathOfFile(file);
 
         try {
@@ -154,7 +154,7 @@ public class FolderSelectorActivity extends BaseActivity {
                     return false;
                 }
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString(Constant.PREFERENCE_SAVE_PATH, file.getAbsolutePath());
+                editor.putString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), file.getAbsolutePath());
                 editor.apply();
                 setResult(RESULT_OK);
                 ToastManager.showToast(this, getResources().getString(R.string.activity_attention_path_set) + file.getAbsolutePath(), Toast.LENGTH_SHORT);
@@ -340,10 +340,10 @@ public class FolderSelectorActivity extends BaseActivity {
                     break;
                 case 0: {
                     try {
-                        if (PinyinUtils.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.getFirstSpell(o.name).toLowerCase()) > 0) {
+                        if (PinyinUtils.INSTANCE.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.INSTANCE.getFirstSpell(o.name).toLowerCase()) > 0) {
                             return 1;
                         }
-                        if (PinyinUtils.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.getFirstSpell(o.name).toLowerCase()) < 0) {
+                        if (PinyinUtils.INSTANCE.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.INSTANCE.getFirstSpell(o.name).toLowerCase()) < 0) {
                             return -1;
                         }
                     } catch (Exception e) {
@@ -353,10 +353,10 @@ public class FolderSelectorActivity extends BaseActivity {
                 break;
                 case 1: {
                     try {
-                        if (PinyinUtils.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.getFirstSpell(o.name).toLowerCase()) > 0) {
+                        if (PinyinUtils.INSTANCE.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.INSTANCE.getFirstSpell(o.name).toLowerCase()) > 0) {
                             return -1;
                         }
-                        if (PinyinUtils.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.getFirstSpell(o.name).toLowerCase()) < 0) {
+                        if (PinyinUtils.INSTANCE.getFirstSpell(this.name).toLowerCase().compareTo(PinyinUtils.INSTANCE.getFirstSpell(o.name).toLowerCase()) < 0) {
                             return 1;
                         }
                     } catch (Exception e) {

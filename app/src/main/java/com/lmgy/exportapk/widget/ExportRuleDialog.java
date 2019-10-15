@@ -49,29 +49,29 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
         preview = dialogView.findViewById(R.id.filename_preview);
         spinner = dialogView.findViewById(R.id.spinner_zip_level);
 
-        editApk.setText(settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK, Constant.PREFERENCE_FILENAME_FONT_DEFAULT));
-        editZip.setText(settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP, Constant.PREFERENCE_FILENAME_FONT_DEFAULT));
+        editApk.setText(settings.getString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_APK(), Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_DEFAULT()));
+        editZip.setText(settings.getString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_ZIP(), Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_DEFAULT()));
         preview.setText(getFormatedExportFileName(editApk.getText().toString(), editZip.getText().toString()));
         spinner.setAdapter(new ArrayAdapter<>(context, R.layout.item_spinner_single_text, R.id.spinner_text, new String[]{context.getResources().getString(R.string.zip_level_default),
                 getContext().getResources().getString(R.string.zip_level_stored), context.getResources().getString(R.string.zip_level_low), context.getResources().getString(R.string.zip_level_normal)
                 , getContext().getResources().getString(R.string.zip_level_high)}));
 
-        int levelSet = settings.getInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT);
+        int levelSet = settings.getInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT());
         try {
             switch (levelSet) {
                 default:
                     spinner.setSelection(0);
                     break;
-                case Constant.ZIP_LEVEL_STORED:
+                case Constant.INSTANCE.getZIP_LEVEL_STORED():
                     spinner.setSelection(1);
                     break;
-                case Constant.ZIP_LEVEL_LOW:
+                case Constant.INSTANCE.getZIP_LEVEL_LOW():
                     spinner.setSelection(2);
                     break;
-                case Constant.ZIP_LEVEL_NORMAL:
+                case Constant.INSTANCE.getZIP_LEVEL_NORMAL():
                     spinner.setSelection(3);
                     break;
-                case Constant.ZIP_LEVEL_HIGH:
+                case Constant.INSTANCE.getZIP_LEVEL_HIGH():
                     spinner.setSelection(4);
                     break;
             }
@@ -79,15 +79,15 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
             e.printStackTrace();
         }
 
-        if (!editApk.getText().toString().contains(Constant.FONT_APP_NAME) && !editApk.getText().toString().contains(Constant.FONT_APP_PACKAGE_NAME)
-                && !editApk.getText().toString().contains(Constant.FONT_APP_VERSIONCODE) && !editApk.getText().toString().contains(Constant.FONT_APP_VERSIONNAME)) {
+        if (!editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_NAME()) && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME())
+                && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONCODE()) && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONNAME())) {
             dialogView.findViewById(R.id.filename_apk_warn).setVisibility(View.VISIBLE);
         } else {
             dialogView.findViewById(R.id.filename_apk_warn).setVisibility(View.GONE);
         }
 
-        if (!editZip.getText().toString().contains(Constant.FONT_APP_NAME) && !editZip.getText().toString().contains(Constant.FONT_APP_PACKAGE_NAME)
-                && !editZip.getText().toString().contains(Constant.FONT_APP_VERSIONCODE) && !editZip.getText().toString().contains(Constant.FONT_APP_VERSIONNAME)) {
+        if (!editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_NAME()) && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME())
+                && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONCODE()) && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONNAME())) {
             dialogView.findViewById(R.id.filename_zip_warn).setVisibility(View.VISIBLE);
         } else {
             dialogView.findViewById(R.id.filename_zip_warn).setVisibility(View.GONE);
@@ -111,8 +111,8 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
             public void afterTextChanged(Editable s) {
                 // TODO Auto-generated method stub
                 preview.setText(getFormatedExportFileName(editApk.getText().toString(), editZip.getText().toString()));
-                if (!editApk.getText().toString().contains(Constant.FONT_APP_NAME) && !editApk.getText().toString().contains(Constant.FONT_APP_PACKAGE_NAME)
-                        && !editApk.getText().toString().contains(Constant.FONT_APP_VERSIONCODE) && !editApk.getText().toString().contains(Constant.FONT_APP_VERSIONNAME)) {
+                if (!editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_NAME()) && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME())
+                        && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONCODE()) && !editApk.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONNAME())) {
                     dialogView.findViewById(R.id.filename_apk_warn).setVisibility(View.VISIBLE);
                 } else {
                     dialogView.findViewById(R.id.filename_apk_warn).setVisibility(View.GONE);
@@ -134,8 +134,8 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
             public void afterTextChanged(Editable s) {
                 // TODO Auto-generated method stub
                 preview.setText(getFormatedExportFileName(editApk.getText().toString(), editZip.getText().toString()));
-                if (!editZip.getText().toString().contains(Constant.FONT_APP_NAME) && !editZip.getText().toString().contains(Constant.FONT_APP_PACKAGE_NAME)
-                        && !editZip.getText().toString().contains(Constant.FONT_APP_VERSIONCODE) && !editZip.getText().toString().contains(Constant.FONT_APP_VERSIONNAME)) {
+                if (!editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_NAME()) && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME())
+                        && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONCODE()) && !editZip.getText().toString().contains(Constant.INSTANCE.getFONT_APP_VERSIONNAME())) {
                     dialogView.findViewById(R.id.filename_zip_warn).setVisibility(View.VISIBLE);
                 } else {
                     dialogView.findViewById(R.id.filename_zip_warn).setVisibility(View.GONE);
@@ -159,37 +159,37 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
                 break;
             case R.id.filename_appname: {
                 if (editApk.isFocused()) {
-                    editApk.getText().insert(editApk.getSelectionStart(), Constant.FONT_APP_NAME);
+                    editApk.getText().insert(editApk.getSelectionStart(), Constant.INSTANCE.getFONT_APP_NAME());
                 }
                 if (editZip.isFocused()) {
-                    editZip.getText().insert(editZip.getSelectionStart(), Constant.FONT_APP_NAME);
+                    editZip.getText().insert(editZip.getSelectionStart(), Constant.INSTANCE.getFONT_APP_NAME());
                 }
             }
             break;
             case R.id.filename_packagename: {
                 if (editApk.isFocused()) {
-                    editApk.getText().insert(editApk.getSelectionStart(), Constant.FONT_APP_PACKAGE_NAME);
+                    editApk.getText().insert(editApk.getSelectionStart(), Constant.INSTANCE.getFONT_APP_PACKAGE_NAME());
                 }
                 if (editZip.isFocused()) {
-                    editZip.getText().insert(editZip.getSelectionStart(), Constant.FONT_APP_PACKAGE_NAME);
+                    editZip.getText().insert(editZip.getSelectionStart(), Constant.INSTANCE.getFONT_APP_PACKAGE_NAME());
                 }
             }
             break;
             case R.id.filename_version: {
                 if (editApk.isFocused()) {
-                    editApk.getText().insert(editApk.getSelectionStart(), Constant.FONT_APP_VERSIONNAME);
+                    editApk.getText().insert(editApk.getSelectionStart(), Constant.INSTANCE.getFONT_APP_VERSIONNAME());
                 }
                 if (editZip.isFocused()) {
-                    editZip.getText().insert(editZip.getSelectionStart(), Constant.FONT_APP_VERSIONNAME);
+                    editZip.getText().insert(editZip.getSelectionStart(), Constant.INSTANCE.getFONT_APP_VERSIONNAME());
                 }
             }
             break;
             case R.id.filename_versioncode: {
                 if (editApk.isFocused()) {
-                    editApk.getText().insert(editApk.getSelectionStart(), Constant.FONT_APP_VERSIONCODE);
+                    editApk.getText().insert(editApk.getSelectionStart(), Constant.INSTANCE.getFONT_APP_VERSIONCODE());
                 }
                 if (editZip.isFocused()) {
-                    editZip.getText().insert(editZip.getSelectionStart(), Constant.FONT_APP_VERSIONCODE);
+                    editZip.getText().insert(editZip.getSelectionStart(), Constant.INSTANCE.getFONT_APP_VERSIONCODE());
                 }
             }
             break;
@@ -223,34 +223,34 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
                 return;
             }
 
-            String apkReplacedVariables = editApk.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
-            String zipReplacedVariables = editZip.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
+            String apkReplacedVariables = editApk.getText().toString().replace(Constant.INSTANCE.getFONT_APP_NAME(), "").replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), "").replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), "").replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), "");
+            String zipReplacedVariables = editZip.getText().toString().replace(Constant.INSTANCE.getFONT_APP_NAME(), "").replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), "").replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), "").replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), "");
             if (!EnvironmentUtils.isALegalFileName(apkReplacedVariables) || !EnvironmentUtils.isALegalFileName(zipReplacedVariables)) {
                 ToastManager.showToast(getContext(), getContext().getResources().getString(R.string.file_invalid_name), Toast.LENGTH_SHORT);
                 return;
             }
 
             SharedPreferences.Editor editor = settings.edit();
-            editor.putString(Constant.PREFERENCE_FILENAME_FONT_APK, editApk.getText().toString());
-            editor.putString(Constant.PREFERENCE_FILENAME_FONT_ZIP, editZip.getText().toString());
+            editor.putString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_APK(), editApk.getText().toString());
+            editor.putString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_ZIP(), editZip.getText().toString());
             int zipSelection = spinner.getSelectedItemPosition();
             switch (zipSelection) {
                 default:
                     break;
                 case 0:
-                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT());
                     break;
                 case 1:
-                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_STORED);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getZIP_LEVEL_STORED());
                     break;
                 case 2:
-                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_LOW);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getZIP_LEVEL_LOW());
                     break;
                 case 3:
-                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_NORMAL);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getZIP_LEVEL_NORMAL());
                     break;
                 case 4:
-                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_HIGH);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_ZIP_COMPRESS_LEVEL(), Constant.INSTANCE.getZIP_LEVEL_HIGH());
                     break;
             }
             editor.apply();
@@ -267,10 +267,10 @@ public class ExportRuleDialog extends AlertDialog implements View.OnClickListene
         final String PREVIEW_PACKAGENAME = getContext().getResources().getString(R.string.dialog_filename_preview_packagename);
         final String PREVIEW_VERSION = getContext().getResources().getString(R.string.dialog_filename_preview_version);
         final String PREVIEW_VERSIONCODE = getContext().getResources().getString(R.string.dialog_filename_preview_versioncode);
-        return getContext().getResources().getString(R.string.word_preview) + ":\n\nAPK:  " + apk.replace(Constant.FONT_APP_NAME, PREVIEW_APPNAME)
-                .replace(Constant.FONT_APP_PACKAGE_NAME, PREVIEW_PACKAGENAME).replace(Constant.FONT_APP_VERSIONCODE, PREVIEW_VERSIONCODE).replace(Constant.FONT_APP_VERSIONNAME, PREVIEW_VERSION) + ".apk\n\n"
-                + "ZIP:  " + zip.replace(Constant.FONT_APP_NAME, PREVIEW_APPNAME)
-                .replace(Constant.FONT_APP_PACKAGE_NAME, PREVIEW_PACKAGENAME).replace(Constant.FONT_APP_VERSIONCODE, PREVIEW_VERSIONCODE).replace(Constant.FONT_APP_VERSIONNAME, PREVIEW_VERSION) + ".zip";
+        return getContext().getResources().getString(R.string.word_preview) + ":\n\nAPK:  " + apk.replace(Constant.INSTANCE.getFONT_APP_NAME(), PREVIEW_APPNAME)
+                .replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), PREVIEW_PACKAGENAME).replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), PREVIEW_VERSIONCODE).replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), PREVIEW_VERSION) + ".apk\n\n"
+                + "ZIP:  " + zip.replace(Constant.INSTANCE.getFONT_APP_NAME(), PREVIEW_APPNAME)
+                .replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), PREVIEW_PACKAGENAME).replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), PREVIEW_VERSIONCODE).replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), PREVIEW_VERSION) + ".zip";
     }
 
 }

@@ -6,7 +6,6 @@ import android.text.format.Formatter;
 import androidx.annotation.NonNull;
 
 import com.lmgy.exportapk.R;
-import com.lmgy.exportapk.bean.AppItemBean;
 
 import java.text.DecimalFormat;
 

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.Formatter;
@@ -13,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -30,10 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.PermissionChecker;
-import androidx.core.util.Pair;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,8 +36,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lmgy.exportapk.Global;
 import com.lmgy.exportapk.R;
+import com.lmgy.exportapk.adapter.ListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
-import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.SearchTask;
 import com.lmgy.exportapk.utils.Storage;
@@ -134,17 +129,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     searchTask = new SearchTask(totalList, newText, result -> {
                         progressBar.setVisibility(View.GONE);
                         ListAdapter adapter;
-                        int mode = Global.getGlobalSharedPreferences(MainActivity.this).getInt(Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE
-                                , Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT);
+                        int mode = Global.getGlobalSharedPreferences(MainActivity.this).getInt(Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE()
+                                , Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT());
                         if (mode == 1) {
                             GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 4);
                             recyclerView.setLayoutManager(gridLayoutManager);
-                            adapter = new ListAdapter(result, 1);
+                            adapter = new ListAdapter(getApplicationContext(),result, 1);
                         } else {
                             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
                             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                             recyclerView.setLayoutManager(linearLayoutManager);
-                            adapter = new ListAdapter(result, 0);
+                            adapter = new ListAdapter(getApplicationContext(), result, 0);
                         }
 
                         recyclerView.setAdapter(adapter);
@@ -159,11 +154,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         final SharedPreferences settings = Global.getGlobalSharedPreferences(this);
         final CheckBox cbShowSys = findViewById(R.id.main_show_system_app);
-        cbShowSys.setChecked(settings.getBoolean(Constant.PREFERENCE_SHOW_SYSTEM_APP, Constant.PREFERENCE_SHOW_SYSTEM_APP_DEFAULT));
+        cbShowSys.setChecked(settings.getBoolean(Constant.INSTANCE.getPREFERENCE_SHOW_SYSTEM_APP(), Constant.INSTANCE.getPREFERENCE_SHOW_SYSTEM_APP_DEFAULT()));
         cbShowSys.setOnCheckedChangeListener((buttonView, isChecked) -> {
             cbShowSys.setEnabled(false);
             SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean(Constant.PREFERENCE_SHOW_SYSTEM_APP, isChecked);
+            editor.putBoolean(Constant.INSTANCE.getPREFERENCE_SHOW_SYSTEM_APP(), isChecked);
             editor.apply();
             refreshList();
         });
@@ -263,7 +258,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         closeMultiSelectModeForExternalVariables(false);
         recyclerView.setAdapter(null);
 
-        final boolean isShowSys = Global.getGlobalSharedPreferences(this).getBoolean(Constant.PREFERENCE_SHOW_SYSTEM_APP, Constant.PREFERENCE_SHOW_SYSTEM_APP_DEFAULT);
+        final boolean isShowSys = Global.getGlobalSharedPreferences(this).getBoolean(Constant.INSTANCE.getPREFERENCE_SHOW_SYSTEM_APP(), Constant.INSTANCE.getPREFERENCE_SHOW_SYSTEM_APP_DEFAULT());
         final CheckBox cbShowSys = findViewById(R.id.main_show_system_app);
         final LoadingListDialog dialog = new LoadingListDialog(this);
         try {
@@ -291,18 +286,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                int mode = Global.getGlobalSharedPreferences(MainActivity.this).getInt(Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE
-                        , Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT);
+                int mode = Global.getGlobalSharedPreferences(MainActivity.this).getInt(Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE()
+                        , Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT());
                 ListAdapter adapter;
                 if (mode == 1) {
                     GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 4);
                     recyclerView.setLayoutManager(gridLayoutManager);
-                    adapter = new ListAdapter(appList, 1);
+                    adapter = new ListAdapter(getApplicationContext(), appList, 1);
                 } else {
                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
                     linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     recyclerView.setLayoutManager(linearLayoutManager);
-                    adapter = new ListAdapter(appList, 0);
+                    adapter = new ListAdapter(getApplicationContext(), appList, 0);
                 }
 
                 recyclerView.setAdapter(adapter);
@@ -458,9 +453,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         if (id == R.id.action_view) {
             SharedPreferences settings = Global.getGlobalSharedPreferences(this);
-            int mode = settings.getInt(Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE, Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT);
+            int mode = settings.getInt(Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE(), Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT());
             SharedPreferences.Editor editor = settings.edit();
-            editor.putInt(Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE, mode == 0 ? 1 : 0);
+            editor.putInt(Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE(), mode == 0 ? 1 : 0);
             editor.apply();
 
             closeMultiSelectModeForExternalVariables(false);
@@ -471,7 +466,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (id == R.id.action_sort) {
             final SharedPreferences settings = Global.getGlobalSharedPreferences(this);
             final SharedPreferences.Editor editor = settings.edit();
-            int sort = settings.getInt(Constant.PREFERENCE_SORT_CONFIG, 0);
+            int sort = settings.getInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 0);
             View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_sort, null);
             RadioButton ra_default = dialogView.findViewById(R.id.sort_ra_default);
             RadioButton ra_name_ascend = dialogView.findViewById(R.id.sort_ra_ascending_appname);
@@ -498,55 +493,55 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     })
                     .show();
             ra_default.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 0);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 0);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_name_ascend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 1);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 1);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_name_descend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 2);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 2);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_size_ascend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 3);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 3);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_size_descend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 4);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 4);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_update_time_ascend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 5);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 5);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_update_time_descend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 6);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 6);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_install_time_ascend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 7);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 7);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
             });
             ra_install_time_descend.setOnClickListener(v -> {
-                editor.putInt(Constant.PREFERENCE_SORT_CONFIG, 8);
+                editor.putInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 8);
                 editor.apply();
                 dialog.cancel();
                 refreshList();
@@ -613,7 +608,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (list == null) {
             list = new ArrayList<>();
         }
-        recyclerView.setAdapter(new ListAdapter(list, Global.getGlobalSharedPreferences(this).getInt(Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE, Constant.PREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT)));
+        recyclerView.setAdapter(new ListAdapter(getApplicationContext(), list, Global.getGlobalSharedPreferences(this).getInt(Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE(), Constant.INSTANCE.getPREFERENCE_MAIN_PAGE_VIEW_MODE_DEFAULT())));
         bottomCard.setVisibility(View.VISIBLE);
         try {
             getSupportActionBar().setDisplayShowCustomEnabled(false);
@@ -661,7 +656,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void refreshAvailableStorage() {
         ((TextView) findViewById(R.id.main_storage_remain)).setText(getResources().getString(R.string.main_card_remaining_storage) + ":" +
-                Formatter.formatFileSize(this, Storage.getAvaliableSizeOfPath(Global.getSavePath(this))));
+                Formatter.formatFileSize(this, Storage.INSTANCE.getAvaliableSizeOfPath(Global.getSavePath(this))));
     }
 
     private void checkAndExit() {
@@ -693,197 +688,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         finish();
     }
 
-
-    private class ListAdapter extends RecyclerView.Adapter<ViewHolder> {
-
-        static final int MODE_LINEAR = 0;
-        static final int MODE_GRID = 1;
-
-        private List<AppItemBean> list;
-        private boolean[] isSelected;
-        private boolean isMultiSelectMode = false;
-        private int mode = 0;
-
-        private ListAdapter(@NonNull List<AppItemBean> list, int mode) {
-            this.list = list;
-            isSelected = new boolean[list.size()];
-            if (mode == 1) {
-                this.mode = 1;
-            }
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            return new ViewHolder(LayoutInflater.from(MainActivity.this).inflate(mode == 0 ? R.layout.item_app_info_linear
-                    : R.layout.item_app_info_grid, viewGroup, false), mode);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
-            try {
-                final AppItemBean item = list.get(viewHolder.getAdapterPosition());
-                if (item == null) {
-                    return;
-                }
-                viewHolder.title.setText(String.valueOf(item.getAppName()));
-                viewHolder.title.setTextColor(getResources().getColor((item.getPackageInfo().applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) > 0 ?
-                        R.color.colorSystemAppTitleColor : R.color.colorHighLightText));
-                //viewHolder.icon.setImageDrawable(item.getIcon());
-                viewHolder.icon.setImageDrawable(item.getIcon(MainActivity.this));
-                if (mode == 0) {
-                    viewHolder.description.setText(String.valueOf(item.getPackageName()));
-                    viewHolder.right.setText(Formatter.formatFileSize(MainActivity.this, item.getSize()));
-                    viewHolder.cb.setChecked(isSelected[viewHolder.getAdapterPosition()]);
-                    viewHolder.right.setVisibility(isMultiSelectMode ? View.GONE : View.VISIBLE);
-                    viewHolder.cb.setVisibility(isMultiSelectMode ? View.VISIBLE : View.GONE);
-                } else if (mode == 1) {
-                    if (isMultiSelectMode) {
-                        viewHolder.root.setBackgroundColor(getResources().getColor(isSelected[viewHolder.getAdapterPosition()]
-                                ? R.color.colorSelectedBackground
-                                : R.color.colorCardArea));
-                    } else {
-                        viewHolder.root.setBackgroundColor(getResources().getColor(R.color.colorCardArea));
-                    }
-                }
-
-                viewHolder.root.setOnClickListener(v -> {
-                    if (isMultiSelectMode) {
-                        isSelected[viewHolder.getAdapterPosition()] = !isSelected[viewHolder.getAdapterPosition()];
-                        refreshButtonStatus();
-                        notifyItemChanged(viewHolder.getAdapterPosition());
-                    } else {
-                        Intent intent = new Intent(MainActivity.this, AppDetailActivity.class);
-                        //intent.putExtra(EXTRA_PARCELED_APP_ITEM,item);
-                        intent.putExtra(EXTRA_PACKAGE_NAME, item.getPackageName());
-                        ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, new Pair<>(viewHolder.icon, "icon"));
-                        try {
-                            ActivityCompat.startActivity(MainActivity.this, intent, compat.toBundle());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                });
-                viewHolder.root.setOnLongClickListener(isMultiSelectMode ? null : (View.OnLongClickListener) v -> {
-                    swipeRefreshLayout.setEnabled(false);
-                    isSelected = new boolean[list.size()];
-                    isSelected[viewHolder.getAdapterPosition()] = true;
-                    isMultiSelectMode = true;
-                    refreshButtonStatus();
-                    notifyDataSetChanged();
-                    try {
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    bottomCard.setVisibility(View.GONE);
-                    bottomCard.startAnimation(AnimationUtils.loadAnimation(MainActivity.this, R.anim.entry_300));
-                    bottomCardMultiSelect.setVisibility(View.VISIBLE);
-                    return true;
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        private void closeMultiSelectMode() {
-            isMultiSelectMode = false;
-            notifyDataSetChanged();
-        }
-
-        private boolean getIsMultiSelectMode() {
-            return isMultiSelectMode;
-        }
-
-        private void setSelectAll(boolean selected) {
-            if (!isMultiSelectMode || isSelected == null) {
-                return;
-            }
-            for (int i = 0; i < isSelected.length; i++) {
-                isSelected[i] = selected;
-            }
-            mainExport.setEnabled(selected);
-            mainShare.setEnabled(selected);
-            refreshButtonStatus();
-            notifyDataSetChanged();
-        }
-
-        private void refreshButtonStatus() {
-            mainExport.setEnabled(getSelectedNum() > 0);
-            mainShare.setEnabled(getSelectedNum() > 0);
-            ((TextView) findViewById(R.id.main_select_num_size)).setText(getSelectedNum() + getResources().getString(R.string.unit_item) + "/" + Formatter.formatFileSize(MainActivity.this, getSelectedFileLength()));
-        }
-
-
-        /**
-         * 返回的是初始化data,obb为false的副本
-         */
-        private List<AppItemBean> getSelectedAppItems() {
-            ArrayList<AppItemBean> list_selected = new ArrayList<>();
-            if (!isMultiSelectMode) {
-                return list_selected;
-            }
-            for (int i = 0; i < list.size(); i++) {
-                if (isSelected[i]) {
-                    list_selected.add(new AppItemBean(list.get(i), false, false));
-                }
-            }
-            return list_selected;
-        }
-
-        private int getSelectedNum() {
-            int i = 0;
-            for (boolean b : isSelected) {
-                if (b) {
-                    i++;
-                }
-            }
-            return i;
-        }
-
-        private long getSelectedFileLength() {
-            long length = 0;
-            for (int i = 0; i < isSelected.length; i++) {
-                if (isSelected[i]) {
-                    length += list.get(i).getSize();
-                }
-            }
-            return length;
-        }
-    }
-
-    private static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView icon;
-        TextView title;
-        TextView description;
-        TextView right;
-        CheckBox cb;
-        View root;
-
-        public ViewHolder(@NonNull View itemView, int mode) {
-            super(itemView);
-            root = itemView.findViewById(R.id.item_app_root);
-            icon = itemView.findViewById(R.id.item_app_icon);
-            title = itemView.findViewById(R.id.item_app_title);
-            if (mode == 0) {
-                description = itemView.findViewById(R.id.item_app_description);
-                right = itemView.findViewById(R.id.item_app_right);
-                cb = itemView.findViewById(R.id.item_app_cb);
-            }
-        }
-    }
 
 
 }

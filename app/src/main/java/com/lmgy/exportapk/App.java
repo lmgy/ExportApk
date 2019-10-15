@@ -17,7 +17,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         SharedPreferences settings = Global.getGlobalSharedPreferences(this);
-        int nightMode = settings.getInt(Constant.PREFERENCE_NIGHT_MODE, Constant.PREFERENCE_NIGHT_MODE_DEFAULT);
+        int nightMode = settings.getInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), Constant.INSTANCE.getPREFERENCE_NIGHT_MODE_DEFAULT());
         AppCompatDelegate.setDefaultNightMode(nightMode);
     }
 }

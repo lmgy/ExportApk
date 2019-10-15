@@ -72,22 +72,22 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.settings_share_mode_area: {
                 View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_share_mode, null);
-                int mode = settings.getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT);
-                ((RadioButton) dialogView.findViewById(R.id.share_mode_direct_ra)).setChecked(mode == Constant.SHARE_MODE_DIRECT);
-                ((RadioButton) dialogView.findViewById(R.id.share_mode_after_extract_ra)).setChecked(mode == Constant.SHARE_MODE_AFTER_EXTRACT);
+                int mode = settings.getInt(Constant.INSTANCE.getPREFERENCE_SHAREMODE(), Constant.INSTANCE.getPREFERENCE_SHAREMODE_DEFAULT());
+                ((RadioButton) dialogView.findViewById(R.id.share_mode_direct_ra)).setChecked(mode == Constant.INSTANCE.getSHARE_MODE_DIRECT());
+                ((RadioButton) dialogView.findViewById(R.id.share_mode_after_extract_ra)).setChecked(mode == Constant.INSTANCE.getSHARE_MODE_AFTER_EXTRACT());
                 final AlertDialog dialog = new AlertDialog.Builder(this)
                         .setTitle(getResources().getString(R.string.activity_settings_share_mode))
                         .setView(dialogView)
                         .show();
                 dialogView.findViewById(R.id.share_mode_direct).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_DIRECT);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_SHAREMODE(), Constant.INSTANCE.getSHARE_MODE_DIRECT());
                     editor.apply();
                     refreshSettingValues();
                 });
                 dialogView.findViewById(R.id.share_mode_after_extract).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_AFTER_EXTRACT);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_SHAREMODE(), Constant.INSTANCE.getSHARE_MODE_AFTER_EXTRACT());
                     editor.apply();
                     refreshSettingValues();
                 });
@@ -96,7 +96,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             break;
             case R.id.settings_night_mode_area: {
                 View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_night_mode, null);
-                int night_mode = settings.getInt(Constant.PREFERENCE_NIGHT_MODE, Constant.PREFERENCE_NIGHT_MODE_DEFAULT);
+                int night_mode = settings.getInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), Constant.INSTANCE.getPREFERENCE_NIGHT_MODE_DEFAULT());
                 ((RadioButton) dialogView.findViewById(R.id.night_mode_enabled_ra)).setChecked(night_mode == AppCompatDelegate.MODE_NIGHT_YES);
                 ((RadioButton) dialogView.findViewById(R.id.night_mode_disabled_ra)).setChecked(night_mode == AppCompatDelegate.MODE_NIGHT_NO);
                 ((RadioButton) dialogView.findViewById(R.id.night_mode_auto_ra)).setChecked(night_mode == AppCompatDelegate.MODE_NIGHT_AUTO);
@@ -107,25 +107,25 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                         .show();
                 dialogView.findViewById(R.id.night_mode_enabled).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), AppCompatDelegate.MODE_NIGHT_YES);
                     editor.apply();
                     refreshNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 });
                 dialogView.findViewById(R.id.night_mode_disabled).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_NO);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), AppCompatDelegate.MODE_NIGHT_NO);
                     editor.apply();
                     refreshNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 });
                 dialogView.findViewById(R.id.night_mode_auto).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_AUTO);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), AppCompatDelegate.MODE_NIGHT_AUTO);
                     editor.apply();
                     refreshNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                 });
                 dialogView.findViewById(R.id.night_mode_follow_system).setOnClickListener(v -> {
                     dialog.cancel();
-                    editor.putInt(Constant.PREFERENCE_NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    editor.putInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                     editor.apply();
                     refreshNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 });
@@ -137,17 +137,17 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 final CheckBox cb_activities = dialogView.findViewById(R.id.loading_activities);
                 final CheckBox cb_receivers = dialogView.findViewById(R.id.loading_receivers);
                 final CheckBox cb_static_loaders = dialogView.findViewById(R.id.loading_static_loaders);
-                cb_permissions.setChecked(settings.getBoolean(Constant.PREFERENCE_LOAD_PERMISSIONS, Constant.PREFERENCE_LOAD_PERMISSIONS_DEFAULT));
-                cb_activities.setChecked(settings.getBoolean(Constant.PREFERENCE_LOAD_ACTIVITIES, Constant.PREFERENCE_LOAD_ACTIVITIES_DEFAULT));
-                cb_receivers.setChecked(settings.getBoolean(Constant.PREFERENCE_LOAD_RECEIVERS, Constant.PREFERENCE_LOAD_RECEIVERS_DEFAULT));
-                cb_static_loaders.setChecked(settings.getBoolean(Constant.PREFERENCE_LOAD_STATIC_LOADERS, Constant.PREFERENCE_LOAD_STATIC_LOADERS_DEFAULT));
+                cb_permissions.setChecked(settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS(), Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS_DEFAULT()));
+                cb_activities.setChecked(settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES(), Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES_DEFAULT()));
+                cb_receivers.setChecked(settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS(), Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS_DEFAULT()));
+                cb_static_loaders.setChecked(settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS(), Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS_DEFAULT()));
                 new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.activity_settings_loading_options))
                         .setView(dialogView)
                         .setPositiveButton(getResources().getString(R.string.dialog_button_confirm), (dialog, which) -> {
-                            editor.putBoolean(Constant.PREFERENCE_LOAD_PERMISSIONS, cb_permissions.isChecked());
-                            editor.putBoolean(Constant.PREFERENCE_LOAD_ACTIVITIES, cb_activities.isChecked());
-                            editor.putBoolean(Constant.PREFERENCE_LOAD_RECEIVERS, cb_receivers.isChecked());
-                            editor.putBoolean(Constant.PREFERENCE_LOAD_STATIC_LOADERS, cb_static_loaders.isChecked());
+                            editor.putBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS(), cb_permissions.isChecked());
+                            editor.putBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES(), cb_activities.isChecked());
+                            editor.putBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS(), cb_receivers.isChecked());
+                            editor.putBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS(), cb_static_loaders.isChecked());
                             editor.apply();
                             refreshSettingValues();
                             setResult(RESULT_OK);
@@ -206,13 +206,13 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         if (settings == null) {
             return;
         }
-        ((TextView) findViewById(R.id.settings_path_value)).setText(settings.getString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT));
+        ((TextView) findViewById(R.id.settings_path_value)).setText(settings.getString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT()));
         ((TextView) findViewById(R.id.settings_share_mode_value)).setText(
                 getResources().getString(
-                        settings.getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_DIRECT ?
+                        settings.getInt(Constant.INSTANCE.getPREFERENCE_SHAREMODE(), Constant.INSTANCE.getPREFERENCE_SHAREMODE_DEFAULT()) == Constant.INSTANCE.getSHARE_MODE_DIRECT() ?
                                 R.string.share_mode_direct : R.string.share_mode_export));
         String night_mode_value = "";
-        switch (settings.getInt(Constant.PREFERENCE_NIGHT_MODE, Constant.PREFERENCE_NIGHT_MODE_DEFAULT)) {
+        switch (settings.getInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), Constant.INSTANCE.getPREFERENCE_NIGHT_MODE_DEFAULT())) {
             default:
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
@@ -230,22 +230,22 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
         ((TextView) findViewById(R.id.settings_night_mode_value)).setText(night_mode_value);
         String read_options = "";
-        if (settings.getBoolean(Constant.PREFERENCE_LOAD_PERMISSIONS, Constant.PREFERENCE_LOAD_PERMISSIONS_DEFAULT)) {
+        if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS(), Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS_DEFAULT())) {
             read_options += getResources().getString(R.string.activity_detail_permissions);
         }
-        if (settings.getBoolean(Constant.PREFERENCE_LOAD_ACTIVITIES, Constant.PREFERENCE_LOAD_ACTIVITIES_DEFAULT)) {
+        if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES(), Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES_DEFAULT())) {
             if (!"".equals(read_options)) {
                 read_options += ",";
             }
             read_options += getResources().getString(R.string.activity_detail_activities);
         }
-        if (settings.getBoolean(Constant.PREFERENCE_LOAD_RECEIVERS, Constant.PREFERENCE_LOAD_RECEIVERS_DEFAULT)) {
+        if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS(), Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS_DEFAULT())) {
             if (!"".equals(read_options)) {
                 read_options += ",";
             }
             read_options += getResources().getString(R.string.activity_detail_receivers);
         }
-        if (settings.getBoolean(Constant.PREFERENCE_LOAD_STATIC_LOADERS, Constant.PREFERENCE_LOAD_STATIC_LOADERS_DEFAULT)) {
+        if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS(), Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS_DEFAULT())) {
             if (!"".equals(read_options)) {
                 read_options += ",";
             }

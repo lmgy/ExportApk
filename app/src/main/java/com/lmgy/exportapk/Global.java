@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.ExportTask;
 import com.lmgy.exportapk.widget.DataObbDialog;
@@ -201,7 +200,7 @@ public class Global {
             return;
         }
         boolean ifNeedExport = Global.getGlobalSharedPreferences(activity)
-                .getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT;
+                .getInt(Constant.INSTANCE.getPREFERENCE_SHAREMODE(), Constant.INSTANCE.getPREFERENCE_SHAREMODE_DEFAULT()) == Constant.INSTANCE.getSHARE_MODE_AFTER_EXTRACT();
         if (ifNeedExport) {
             DataObbDialog dialog = new DataObbDialog(activity, items, exportList -> {
                 String dulplicatedInfo = getDuplicatedFileInfo(activity, items);
@@ -280,11 +279,11 @@ public class Global {
     @NonNull
     public static String getSavePath(@NonNull Context context) {
         try {
-            return getGlobalSharedPreferences(context).getString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT);
+            return getGlobalSharedPreferences(context).getString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Constant.PREFERENCE_SAVE_PATH_DEFAULT;
+        return Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT();
     }
 
     /**
@@ -297,18 +296,18 @@ public class Global {
         try {
             SharedPreferences settings = getGlobalSharedPreferences(context);
             if ("apk".equals(extension.toLowerCase(Locale.getDefault()))) {
-                return settings.getString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT)
-                        + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK, Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.getAppName()))
-                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.getPackageName()))
-                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.getVersionCode()))
-                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.getVersionName())) + ".apk";
+                return settings.getString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT())
+                        + "/" + settings.getString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_APK(), Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_DEFAULT()).replace(Constant.INSTANCE.getFONT_APP_NAME(), String.valueOf(item.getAppName()))
+                        .replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), String.valueOf(item.getPackageName()))
+                        .replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), String.valueOf(item.getVersionCode()))
+                        .replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), String.valueOf(item.getVersionName())) + ".apk";
             }
             if ("zip".equals(extension.toLowerCase(Locale.ENGLISH))) {
-                return settings.getString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT)
-                        + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP, Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.getAppName()))
-                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.getPackageName()))
-                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.getVersionCode()))
-                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.getVersionName())) + ".zip";
+                return settings.getString(Constant.INSTANCE.getPREFERENCE_SAVE_PATH(), Constant.INSTANCE.getPREFERENCE_SAVE_PATH_DEFAULT())
+                        + "/" + settings.getString(Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_ZIP(), Constant.INSTANCE.getPREFERENCE_FILENAME_FONT_DEFAULT()).replace(Constant.INSTANCE.getFONT_APP_NAME(), String.valueOf(item.getAppName()))
+                        .replace(Constant.INSTANCE.getFONT_APP_PACKAGE_NAME(), String.valueOf(item.getPackageName()))
+                        .replace(Constant.INSTANCE.getFONT_APP_VERSIONCODE(), String.valueOf(item.getVersionCode()))
+                        .replace(Constant.INSTANCE.getFONT_APP_VERSIONNAME(), String.valueOf(item.getVersionName())) + ".zip";
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -317,7 +316,7 @@ public class Global {
     }
 
     public static SharedPreferences getGlobalSharedPreferences(@NonNull Context context) {
-        return context.getSharedPreferences(Constant.PREFERENCE_NAME, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(Constant.INSTANCE.getPREFERENCE_NAME(), Context.MODE_PRIVATE);
     }
 
     /**
@@ -340,13 +339,13 @@ public class Global {
             PackageManager manager = context.getApplicationContext().getPackageManager();
             SharedPreferences settings = getGlobalSharedPreferences(context);
             int flag = PackageManager.GET_SIGNATURES;
-            if (settings.getBoolean(Constant.PREFERENCE_LOAD_PERMISSIONS, Constant.PREFERENCE_LOAD_PERMISSIONS_DEFAULT)) {
+            if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS(), Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS_DEFAULT())) {
                 flag |= PackageManager.GET_PERMISSIONS;
             }
-            if (settings.getBoolean(Constant.PREFERENCE_LOAD_ACTIVITIES, Constant.PREFERENCE_LOAD_ACTIVITIES_DEFAULT)) {
+            if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES(), Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES_DEFAULT())) {
                 flag |= PackageManager.GET_ACTIVITIES;
             }
-            if (settings.getBoolean(Constant.PREFERENCE_LOAD_RECEIVERS, Constant.PREFERENCE_LOAD_RECEIVERS_DEFAULT)) {
+            if (settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS(), Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS_DEFAULT())) {
                 flag |= PackageManager.GET_RECEIVERS;
             }
 
@@ -365,7 +364,7 @@ public class Global {
                 }
                 listSum.add(new AppItemBean(context, info));
             }
-            AppItemBean.sortConfig = settings.getInt(Constant.PREFERENCE_SORT_CONFIG, 0);
+            AppItemBean.sortConfig = settings.getInt(Constant.INSTANCE.getPREFERENCE_SORT_CONFIG(), 0);
             Collections.sort(listSum);
             synchronized (Global.class) {
                 //向全局list保存一个引用

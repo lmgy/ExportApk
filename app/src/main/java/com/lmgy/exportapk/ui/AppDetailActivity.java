@@ -33,7 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.lmgy.exportapk.Global;
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.base.BaseActivity;
-import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.EnvironmentUtils;
 import com.lmgy.exportapk.utils.FileUtils;
@@ -125,8 +124,8 @@ public class AppDetailActivity extends BaseActivity implements View.OnClickListe
         findViewById(R.id.app_detail_static_loader_area).setOnClickListener(this);
 
         new Thread(() -> {
-            final long data = FileUtils.getFileOrFolderSize(new File(Storage.getMainExternalStoragePath() + "/android/data/" + appItem.getPackageName()));
-            final long obb = FileUtils.getFileOrFolderSize(new File(Storage.getMainExternalStoragePath() + "/android/obb/" + appItem.getPackageName()));
+            final long data = FileUtils.INSTANCE.getFileOrFolderSize(new File(Storage.INSTANCE.getMainExternalStoragePath() + "/android/data/" + appItem.getPackageName()));
+            final long obb = FileUtils.INSTANCE.getFileOrFolderSize(new File(Storage.INSTANCE.getMainExternalStoragePath() + "/android/obb/" + appItem.getPackageName()));
             Global.HANDLER.post((Runnable) () -> {
                 findViewById(R.id.app_detail_export_progress_bar).setVisibility(View.GONE);
                 cbData.setText("Data:" + Formatter.formatFileSize(AppDetailActivity.this, data));
@@ -142,10 +141,10 @@ public class AppDetailActivity extends BaseActivity implements View.OnClickListe
         final ActivityInfo[] activities = packageInfo.activities;
         final ActivityInfo[] receivers = packageInfo.receivers;
 
-        final boolean get_permissions = settings.getBoolean(Constant.PREFERENCE_LOAD_PERMISSIONS, Constant.PREFERENCE_LOAD_PERMISSIONS_DEFAULT);
-        final boolean get_activities = settings.getBoolean(Constant.PREFERENCE_LOAD_ACTIVITIES, Constant.PREFERENCE_LOAD_ACTIVITIES_DEFAULT);
-        final boolean get_receivers = settings.getBoolean(Constant.PREFERENCE_LOAD_RECEIVERS, Constant.PREFERENCE_LOAD_RECEIVERS_DEFAULT);
-        final boolean get_static_loaders = settings.getBoolean(Constant.PREFERENCE_LOAD_STATIC_LOADERS, Constant.PREFERENCE_LOAD_STATIC_LOADERS_DEFAULT);
+        final boolean get_permissions = settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS(), Constant.INSTANCE.getPREFERENCE_LOAD_PERMISSIONS_DEFAULT());
+        final boolean get_activities = settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES(), Constant.INSTANCE.getPREFERENCE_LOAD_ACTIVITIES_DEFAULT());
+        final boolean get_receivers = settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS(), Constant.INSTANCE.getPREFERENCE_LOAD_RECEIVERS_DEFAULT());
+        final boolean get_static_loaders = settings.getBoolean(Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS(), Constant.INSTANCE.getPREFERENCE_LOAD_STATIC_LOADERS_DEFAULT());
 
         new Thread(() -> {
             final ArrayList<View> permission_child_views = new ArrayList<>();
