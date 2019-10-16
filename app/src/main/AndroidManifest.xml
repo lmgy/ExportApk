@@ -12,20 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.AppDetailActivity"
-            android:label="Detail"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.FolderSelectorActivity"
-            android:label="@string/activity_folder_selector_title"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.SettingsActivity"
-            android:label="@string/activity_settings_title"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".ui.activity.MainActivity"
+            android:theme="@style/TransparentSystemUITheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

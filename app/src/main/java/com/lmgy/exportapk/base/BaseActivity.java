@@ -1,28 +1,47 @@
 package com.lmgy.exportapk.base;
 
-import android.view.Menu;
+import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.lang.reflect.Method;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * @author lmgy
- * @date 2019/10/13
+ * @date 2019/10/16
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    public static final String EXTRA_PACKAGE_NAME = "package_name";
 
-    public void setIconEnable(Menu menu, boolean enable) {
-        try {
-            Class<?> clazz = Class.forName("android.support.v7.view.menu.MenuBuilder");
-            Method m = clazz.getDeclaredMethod("setOptionalIconsVisible", boolean.class);
-            m.setAccessible(true);
-            m.invoke(menu, enable);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private Unbinder unbinder;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(this.getLayoutId());
+        unbinder = ButterKnife.bind(this);
+        initView();
     }
+
+    @Override
+    protected void onDestroy() {
+        unbinder.unbind();
+        super.onDestroy();
+    }
+
+    /**
+     * 设置布局
+     *
+     * @return
+     */
+    public abstract int getLayoutId();
+
+    /**
+     * 初始化视图
+     */
+    public abstract void initView();
+
 
 }
