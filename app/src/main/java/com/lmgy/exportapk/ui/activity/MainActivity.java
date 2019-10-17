@@ -6,10 +6,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -21,6 +28,7 @@ import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
+import com.lmgy.exportapk.listener.ListenerNormalMode;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.widget.LoadListDialog;
 
@@ -29,8 +37,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -55,7 +61,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public Thread threadAppInfo, threadSearch, threadExtractApp;
     //    public CopyFilesTask runnableExtractApp;
     public RecyclerView recyclerView;
-    private AppListAdapter list_adapter;
+    private AppListAdapter mAdapter;
 
     //    private SearchTask runnableSearch;
     private Toolbar toolbar;
@@ -65,16 +71,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ProgressBar pg_search;
     private String keyword;
 
+    private Handler mHandler;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHandler = new Handler(getMainLooper());
         ButterKnife.bind(this);
 
-//        dialogLoadList = new LoadListDialog(this);
-//        dialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
-//        dialogLoadList.setCancelable(false);
-//        dialogLoadList.setCanceledOnTouchOutside(false);
-//        dialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
+        dialogLoadList = new LoadListDialog(this);
+        dialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
+        dialogLoadList.setCancelable(false);
+        dialogLoadList.setCanceledOnTouchOutside(false);
+        dialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
 
         refreshList(true);
     }
@@ -95,7 +104,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.main_msg_view).setVisibility(View.VISIBLE);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setAutoMeasureEnabled(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
@@ -106,9 +114,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void refreshList(boolean isShowProcessDialog) {
         recyclerView.setAdapter(null);
-//        Main.sendEmptyMessage(MESSAGE_SET_NORMAL_TEXT_ATT);
         findViewById(R.id.showSystemAPP).setEnabled(false);
-//        listSum = new ArrayList<AppItemBean>();
         if (dialogLoadList != null && isShowProcessDialog) {
             dialogLoadList.show();
         }
@@ -122,8 +128,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onNext(List<AppItemBean> appItemBeans) {
-                        list_adapter = new AppListAdapter(getApplicationContext(), appItemBeans, true);
-                        recyclerView.setAdapter(list_adapter);
+                        mAdapter = new AppListAdapter(getApplicationContext(), appItemBeans, true);
+                        recyclerView.setAdapter(mAdapter);
                     }
 
                     @Override
@@ -133,12 +139,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onComplete() {
-
+                        dialogLoadList.cancel();
                     }
                 });
     }
 
-    private Observable<List<AppItemBean>> getObservable(){
+    private Observable<List<AppItemBean>> getObservable() {
         Observable<List<AppItemBean>> observable = Observable.create(emitter -> {
             PackageManager packagemanager = getPackageManager();
             List<PackageInfo> packageList = packagemanager.getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
@@ -178,10 +184,48 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     }
                     appItemBeanList.add(appItem);
                 }
+                final int process = i + 1;
+                mHandler.post(() -> dialogLoadList.setProgress(process));
             }
             emitter.onNext(appItemBeanList);
+            emitter.onComplete();
         });
         return observable;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (isMultiSelectMode) {
+                closeMultiSelectMode();
+            } else if (isSearchMode) {
+                closeSearchView();
+            } else {
+                this.finish();
+            }
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            default:
+                break;
+            case R.id.action_about:
+                break;
+            case R.id.action_settings:
+                break;
+            case android.R.id.home:
+                break;
+            case R.id.action_search:
+                break;
+            case R.id.action_sort:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -191,6 +235,55 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
 
         }
+    }
+
+
+    private void setMenuVisible(boolean isVisible) {
+        if (this.menu != null) {
+            for (int i = 0; i < menu.size(); i++) {
+                this.menu.getItem(i).setEnabled(isVisible);
+                this.menu.getItem(i).setVisible(isVisible);
+            }
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        this.menu = menu;
+        return true;
+    }
+
+
+    public void closeMultiSelectMode() {
+        TextView extract = findViewById(R.id.text_extract);
+        TextView share = findViewById(R.id.text_share);
+        TextView selectAll = findViewById(R.id.text_selectall);
+        TextView deselectAll = findViewById(R.id.text_deselectall);
+        isMultiSelectMode = false;
+        extract.setOnClickListener(null);
+        share.setOnClickListener(null);
+        selectAll.setOnClickListener(null);
+        deselectAll.setOnClickListener(null);
+
+        mAdapter.cancelMutiSelectMode();
+        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
+        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+
+        Animation animExit = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
+        Animation animEntry = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
+
+        View multiSelectArea = findViewById(R.id.choice_app_view);
+        View mainMsgView = findViewById(R.id.main_msg_view);
+
+        multiSelectArea.startAnimation(animExit);
+        multiSelectArea.setVisibility(View.GONE);
+
+        mainMsgView.startAnimation(animEntry);
+        mainMsgView.setVisibility(View.VISIBLE);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
 

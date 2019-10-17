@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.lmgy.exportapk.bean.AppItemBean;
+import com.lmgy.exportapk.config.Constant;
 
 import java.io.File;
 import java.util.List;
@@ -59,51 +60,51 @@ public class FileUtils {
     }
 
 
-//    public static String getDuplicateFileInfo(Context context, List<AppItemBean> items, String extension) {
-//        try {
-//            String result = "";
-//            for (AppItemBean item : items) {
-//                File file = new File(getAbsoluteWritePath(context, item, extension));
-//                if (file.exists() && !file.isDirectory()) {
-//                    result += file.getAbsolutePath();
-//                    result += "\n\n";
-//                }
-//            }
-//            return result;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return "";
-//    }
+    public static String getDuplicateFileInfo(Context context, List<AppItemBean> items, String extension) {
+        try {
+            String result = "";
+            for (AppItemBean item : items) {
+                File file = new File(getAbsoluteWritePath(context, item, extension));
+                if (file.exists() && !file.isDirectory()) {
+                    result += file.getAbsolutePath();
+                    result += "\n\n";
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
-//    /**
-//     * 返回此项的绝对写入路径
-//     *
-//     * @param item      应用程序信息
-//     * @param extension 必须是“apk”或“zip”，否则此方法将返回空字符串
-//     * @return 此AppItemInfo的绝对写入路径
-//     */
-//    public static String getAbsoluteWritePath(Context context, AppItemBean item, String extension) {
-//        try {
-//            SharedPreferences settings = context.getSharedPreferences(Constant.PREFERENCE_NAME, Activity.MODE_PRIVATE);
-//            if (extension.toLowerCase(Locale.ENGLISH).equals("apk")) {
-//                return savepath + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK,
-//                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
-//                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
-//                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
-//                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".apk";
-//            }
-//            if (extension.toLowerCase(Locale.ENGLISH).equals("zip")) {
-//                return savepath + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP,
-//                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
-//                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
-//                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
-//                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".zip";
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return "";
-//    }
+    /**
+     * 返回此项的绝对写入路径
+     *
+     * @param item      应用程序信息
+     * @param extension 必须是“apk”或“zip”，否则此方法将返回空字符串
+     * @return 此AppItemInfo的绝对写入路径
+     */
+    public static String getAbsoluteWritePath(Context context, AppItemBean item, String extension) {
+        try {
+            SharedPreferences settings = context.getSharedPreferences(Constant.PREFERENCE_NAME, Activity.MODE_PRIVATE);
+            if (extension.toLowerCase(Locale.ENGLISH).equals("apk")) {
+                return Constant.PREFERENCE_SAVE_PATH_DEFAULT + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK,
+                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
+                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
+                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".apk";
+            }
+            if (extension.toLowerCase(Locale.ENGLISH).equals("zip")) {
+                return Constant.PREFERENCE_SAVE_PATH_DEFAULT + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP,
+                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+                        .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
+                        .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
+                        .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".zip";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
 }

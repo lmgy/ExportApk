@@ -111,5 +111,5 @@
     <string name="dialog_firstuse_message">所有导出的应用将会以“包名+版本号”的方式命名并默认保存在“存储/Backup”路径下。\n\n导出路径可自行更改。</string>
     <string name="new_folder">新建文件夹</string>
     <string name="detailed_information">详细信息</string>
-    <string name="varsion">版本号：</string>
+    <string name="version">版本号：</string>
 </resources>

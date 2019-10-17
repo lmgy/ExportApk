@@ -18,8 +18,8 @@ import java.text.DecimalFormat;
 public class LoadListDialog extends AlertDialog {
 
     private ProgressBar progressBar;
-    private TextView textviewPercent;
-    private TextView textviewProgress;
+    private TextView tvPercent;
+    private TextView tvProgress;
     private int progress = 0;
     private int max = 0;
 
@@ -29,8 +29,8 @@ public class LoadListDialog extends AlertDialog {
         View dialogView = layoutInflater.inflate(R.layout.dialog_loadlist, null);
         this.setView(dialogView);
         this.progressBar = dialogView.findViewById(R.id.dialog_loadlist_pgbar);
-        this.textviewPercent = dialogView.findViewById(R.id.dialog_loadlist_textview_percent);
-        this.textviewProgress = dialogView.findViewById(R.id.dialog_loadlist_textview_progress);
+        this.tvPercent = dialogView.findViewById(R.id.dialog_loadlist_textview_percent);
+        this.tvProgress = dialogView.findViewById(R.id.dialog_loadlist_textview_progress);
     }
 
     public void setMax(int max) {
@@ -47,8 +47,8 @@ public class LoadListDialog extends AlertDialog {
         DecimalFormat dm = new DecimalFormat("#.00");
         int percent = (int) (Double.valueOf(dm.format((double) this.progress / this.max)) * 100);
         this.progressBar.setProgress(this.progress);
-        this.textviewPercent.setText(percent + "%");
-        this.textviewProgress.setText(this.progress + "/" + this.max);
+        this.tvPercent.setText(percent + "%");
+        this.tvProgress.setText(this.progress + "/" + this.max);
     }
 
 }
