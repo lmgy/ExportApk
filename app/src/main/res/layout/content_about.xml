@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ui.activity.AboutActivity"
+    tools:showIn="@layout/activity_about">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:background="@color/divider"
+            android:text="what's this"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/text_margin"
+            android:paddingTop="@dimen/text_margin"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:textColor="@color/color_text_black"
+            android:text="exportApp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:background="@color/divider"
+            android:text="Developers"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center|start"
+            android:padding="12dp"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                android:layout_marginStart="2dp"
+                android:src="@mipmap/github"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="16"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="lmgy - http://www.github.com/lmgy" />
+
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:background="@color/divider"
+            android:text="Open Source Licenses"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <include layout="@layout/settings_item"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <include layout="@layout/settings_item"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@color/text_grey" />
+
+        <include layout="@layout/settings_item"/>
+
+
+    </LinearLayout>
+
+
+</androidx.core.widget.NestedScrollView>

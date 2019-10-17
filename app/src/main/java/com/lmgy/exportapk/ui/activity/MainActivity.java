@@ -3,6 +3,7 @@ package com.lmgy.exportapk.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -222,9 +223,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             default:
                 break;
             case R.id.action_about:
-                clickActionAbout();
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
                 break;
             case R.id.action_settings:
+//                Intent intent = new Intent(this, SettingsActivity.class);
+//                startActivity(intent);
                 break;
             case android.R.id.home:
                 break;
@@ -320,17 +324,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
-    @SuppressLint("InflateParams")
-    private void clickActionAbout() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_about, null);
-        AlertDialog dialogAbout = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.app_name))
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setCancelable(true)
-                .setView(dialogView)
-                .setPositiveButton(getResources().getString(R.string.dialog_button_positive), (dialogInterface, i) -> {
-                }).create();
-        dialogAbout.show();
-    }
+//    @SuppressLint("InflateParams")
+//    private void clickActionAbout() {
+//        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_about, null);
+//        AlertDialog dialogAbout = new AlertDialog.Builder(this)
+//                .setTitle(getResources().getString(R.string.app_name))
+//                .setIcon(R.mipmap.ic_launcher_round)
+//                .setCancelable(true)
+//                .setView(dialogView)
+//                .setPositiveButton(getResources().getString(R.string.dialog_button_positive), (dialogInterface, i) -> {
+//                }).create();
+//        dialogAbout.show();
+//    }
 
 }
