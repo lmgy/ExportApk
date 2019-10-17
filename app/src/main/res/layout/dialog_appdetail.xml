@@ -38,16 +38,6 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="12sp"
-            android:textColor="@color/colorAccent"
-            android:text="@string/detailed_information"/>
-
-        <TextView
             android:id="@+id/dialog_appdetail_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -117,7 +107,7 @@
                     android:layout_height="32dp"
                     android:visibility="visible" />
 
-                <com.tokyonth.apkextractor.widget.RoundCheckBox
+                <com.lmgy.exportapk.widget.RoundCheckBox
                     android:id="@+id/dialog_appdetail_extract_data_cb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -127,7 +117,7 @@
                     android:text="Data"
                     android:visibility="gone" />
 
-                <com.tokyonth.apkextractor.widget.RoundCheckBox
+                <com.lmgy.exportapk.widget.RoundCheckBox
                     android:id="@+id/dialog_appdetail_extract_obb_cb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

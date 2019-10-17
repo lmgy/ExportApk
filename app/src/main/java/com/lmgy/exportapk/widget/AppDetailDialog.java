@@ -23,7 +23,7 @@ import java.util.Calendar;
  */
 public class AppDetailDialog extends BottomSheetDialog {
     private TextView tvAtt;
-    public RelativeLayout areaExtract, areaShare, areaDetail;
+    private RelativeLayout areaExtract, areaShare, areaDetail;
     private Context mContext;
     private String appInfo = "";
     private TextView appName;

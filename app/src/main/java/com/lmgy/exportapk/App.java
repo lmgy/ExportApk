@@ -1,6 +1,7 @@
 package com.lmgy.exportapk;
 
 import android.app.Application;
+import android.content.Context;
 
 /**
  * @author lmgy
@@ -8,11 +9,16 @@ import android.app.Application;
  */
 public class App extends Application {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-//        SharedPreferences settings = Global.getGlobalSharedPreferences(this);
-//        int nightMode = settings.getInt(Constant.INSTANCE.getPREFERENCE_NIGHT_MODE(), Constant.INSTANCE.getPREFERENCE_NIGHT_MODE_DEFAULT());
-//        AppCompatDelegate.setDefaultNightMode(nightMode);
+    private static Context mContext;
+
+    public static Context getContext() {
+        return mContext;
     }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        mContext = base.getApplicationContext();
+    }
+
 }

@@ -2,6 +2,7 @@ package com.lmgy.exportapk.adapter;
 
 import android.content.Context;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
 
     public void setItemClickListener(OnItemClickListener itemClickListener) {
         mItemClickListener = itemClickListener;
+        notifyDataSetChanged();
     }
 
     public void setLongClickListener(OnLongClickListener longClickListener) {
@@ -83,6 +85,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
 
         //设置点击和长按事件
         if (mItemClickListener != null) {
+            Log.e("ListenerNormalMode", "onBindViewHolder: " );
             holder.itemView.setOnClickListener(view -> mItemClickListener.onItemClick(position));
         }
         if (mLongClickListener != null) {
