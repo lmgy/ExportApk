@@ -218,12 +218,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             default:
                 break;
             case R.id.action_about:
-                Intent intent = new Intent(this, AboutActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.action_settings:
-//                Intent intent = new Intent(this, SettingsActivity.class);
-//                startActivity(intent);
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case android.R.id.home:
                 break;
