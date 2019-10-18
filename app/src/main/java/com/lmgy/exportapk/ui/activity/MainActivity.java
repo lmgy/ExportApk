@@ -1,6 +1,5 @@
 package com.lmgy.exportapk.ui.activity;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +9,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -259,31 +254,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void closeSearchView() {
-        isSearchMode = false;
-//        if (runnable_search != null) {
-//            runnable_search.setInterrupted();
-//        }
-//        if (this.thread_search != null) {
-//            thread_search.interrupt();
-//            thread_search = null;
-//        }
-
-        mAdapter = new AppListAdapter(this, appItemBeanList, true);
-        pg_search.setVisibility(View.GONE);
-        recyclerView.setAdapter(mAdapter);
-//        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-//        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-        cardView.startAnimation(anim);
-        cardView.setVisibility(View.VISIBLE);
-        setMenuVisible(true);
-//        Main.sendEmptyMessage(MESSAGE_SET_NORMAL_TEXT_ATT);
-    }
+//    private void closeSearchView() {
+//        isSearchMode = false;
+////        if (runnable_search != null) {
+////            runnable_search.setInterrupted();
+////        }
+////        if (this.thread_search != null) {
+////            thread_search.interrupt();
+////            thread_search = null;
+////        }
+//
+//        mAdapter = new AppListAdapter(this, appItemBeanList, true);
+//        pg_search.setVisibility(View.GONE);
+//        recyclerView.setAdapter(mAdapter);
+////        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
+////        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//
+//        Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
+//        cardView.startAnimation(anim);
+//        cardView.setVisibility(View.VISIBLE);
+//        setMenuVisible(true);
+////        Main.sendEmptyMessage(MESSAGE_SET_NORMAL_TEXT_ATT);
+//    }
 
 
     @Override
@@ -294,35 +289,35 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    public void closeMultiSelectMode() {
-        TextView extract = findViewById(R.id.text_extract);
-        TextView share = findViewById(R.id.text_share);
-        TextView selectAll = findViewById(R.id.text_selectall);
-        TextView deselectAll = findViewById(R.id.text_deselectall);
-        isMultiSelectMode = false;
-        extract.setOnClickListener(null);
-        share.setOnClickListener(null);
-        selectAll.setOnClickListener(null);
-        deselectAll.setOnClickListener(null);
-
-        mAdapter.cancelMutiSelectMode();
-//        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-//        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
-
-        Animation animExit = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
-        Animation animEntry = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-
-        View multiSelectArea = findViewById(R.id.choice_app_view);
-        View mainMsgView = findViewById(R.id.main_msg_view);
-
-        multiSelectArea.startAnimation(animExit);
-        multiSelectArea.setVisibility(View.GONE);
-
-        mainMsgView.startAnimation(animEntry);
-        mainMsgView.setVisibility(View.VISIBLE);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    }
+//    public void closeMultiSelectMode() {
+//        TextView extract = findViewById(R.id.text_extract);
+//        TextView share = findViewById(R.id.text_share);
+//        TextView selectAll = findViewById(R.id.text_selectall);
+//        TextView deselectAll = findViewById(R.id.text_deselectall);
+//        isMultiSelectMode = false;
+//        extract.setOnClickListener(null);
+//        share.setOnClickListener(null);
+//        selectAll.setOnClickListener(null);
+//        deselectAll.setOnClickListener(null);
+//
+//        mAdapter.cancelMutiSelectMode();
+////        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
+////        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+//
+//        Animation animExit = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
+//        Animation animEntry = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
+//
+//        View multiSelectArea = findViewById(R.id.choice_app_view);
+//        View mainMsgView = findViewById(R.id.main_msg_view);
+//
+//        multiSelectArea.startAnimation(animExit);
+//        multiSelectArea.setVisibility(View.GONE);
+//
+//        mainMsgView.startAnimation(animEntry);
+//        mainMsgView.setVisibility(View.VISIBLE);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+//    }
 
 //    @SuppressLint("InflateParams")
 //    private void clickActionAbout() {

@@ -85,7 +85,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
 
         //设置点击和长按事件
         if (mItemClickListener != null) {
-            Log.e("ListenerNormalMode", "onBindViewHolder: " );
+//            Log.e("ListenerNormalMode", "onBindViewHolder: " );
             holder.itemView.setOnClickListener(view -> mItemClickListener.onItemClick(position));
         }
         if (mLongClickListener != null) {

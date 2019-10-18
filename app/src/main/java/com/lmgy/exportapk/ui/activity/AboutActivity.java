@@ -21,6 +21,10 @@ import java.util.Objects;
 
 import butterknife.BindView;
 
+/**
+ * @author lmgy
+ * @date 2019/10/18
+ */
 public class AboutActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
