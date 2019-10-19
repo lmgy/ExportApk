@@ -6,15 +6,16 @@ package com.lmgy.exportapk.bean;
  */
 public class AboutBean {
 
-    private String author;
+    private String name;
     private String path;
 
-    public AboutBean(String author, String path){
-
+    public AboutBean(String name, String path){
+        this.name = name;
+        this.path = path;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
