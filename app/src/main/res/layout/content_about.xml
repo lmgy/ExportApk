@@ -98,26 +98,31 @@
             android:background="@color/divider"
             android:text="Open Source Licenses"/>
 
-        <View
+        <ListView
+            android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="0.3dp"
-            android:background="@color/text_grey" />
+            android:layout_height="wrap_content"/>
 
-        <include layout="@layout/settings_item"/>
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0.3dp"-->
+<!--            android:background="@color/text_grey" />-->
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.3dp"
-            android:background="@color/text_grey" />
+<!--        <include layout="@layout/settings_item"/>-->
 
-        <include layout="@layout/settings_item"/>
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0.3dp"-->
+<!--            android:background="@color/text_grey" />-->
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.3dp"
-            android:background="@color/text_grey" />
+<!--        <include layout="@layout/settings_item"/>-->
 
-        <include layout="@layout/settings_item"/>
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0.3dp"-->
+<!--            android:background="@color/text_grey" />-->
+
+<!--        <include layout="@layout/settings_item"/>-->
 
 
     </LinearLayout>

@@ -76,6 +76,7 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
         settingsBeanList.add(new SettingsBean("导出路径", R.drawable.ic_settings_export));
         settingsBeanList.add(new SettingsBean("导出规则", R.drawable.ic_settings_rule));
         settingsBeanList.add(new SettingsBean("分享模式", R.drawable.ic_settings_share));
+        settingsBeanList.add(new SettingsBean("关于", R.drawable.ic_settings_about));
         SettingsListAdapter adapter = new SettingsListAdapter(this, R.layout.layout_settings_card, settingsBeanList);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(this);
@@ -93,14 +94,18 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
                 clickExportRule();
                 break;
             case 2:
-
+                clickExportMode();
+                break;
+            case 3:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
     }
 
     @SuppressLint("InflateParams")
     private void clickExportMode(){
-        int mode = settings.getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT);
+        int mode = Constant.SHARE_MODE_DIRECT;
+//        int mode = settings.getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_sharemode, null, false);
         RadioButton raDirect = dialogView.findViewById(R.id.share_mode_direct_ra);
         RadioButton raAfterExtract = dialogView.findViewById(R.id.share_mode_after_extract_ra);
@@ -111,13 +116,13 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
                 .setView(dialogView)
                 .show();
         shareDialog.findViewById(R.id.share_mode_direct).setOnClickListener(v -> {
-            editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_DIRECT);
-            editor.apply();
+//            editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_DIRECT);
+//            editor.apply();
             shareDialog.cancel();
         });
         dialogView.findViewById(R.id.share_mode_after_extract).setOnClickListener(v -> {
-            editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_AFTER_EXTRACT);
-            editor.apply();
+//            editor.putInt(Constant.PREFERENCE_SHAREMODE, Constant.SHARE_MODE_AFTER_EXTRACT);
+//            editor.apply();
             shareDialog.cancel();
         });
     }
