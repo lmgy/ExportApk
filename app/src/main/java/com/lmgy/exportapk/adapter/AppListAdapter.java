@@ -21,6 +21,7 @@ import java.util.List;
 
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHolder> {
 
+    private static final String TAG = "AppListAdapter";
     private OnItemClickListener mItemClickListener;
     private OnLongClickListener mLongClickListener;
 
@@ -29,11 +30,10 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
     private boolean isMultiSelectMode = false;
     private boolean[] isSelected;
 
-    public AppListAdapter(Context context, List<AppItemBean> appItemBeanList, boolean ifAnim) {
+    public AppListAdapter(Context context, List<AppItemBean> appItemBeanList) {
         this.context = context;
         this.appItemBeanList = appItemBeanList;
         this.isSelected = new boolean[this.appItemBeanList.size()];
-        boolean[] ifshowedAnim = new boolean[this.appItemBeanList.size()];
     }
 
     public void setItemClickListener(OnItemClickListener itemClickListener) {
@@ -73,24 +73,25 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         }
         holder.appSize.setText(Formatter.formatFileSize(context, item.getAppSize()));
         if (this.isMultiSelectMode && this.isSelected != null) {
+            Log.e(TAG, "onBindViewHolder: View.VISIBLE");
             if (position < this.isSelected.length) {
+                Log.e(TAG, "onBindViewHolder: setcheck" );
                 holder.select.setChecked(this.isSelected[position]);
             }
             holder.select.setVisibility(View.VISIBLE);
             holder.appSize.setVisibility(View.GONE);
         } else {
+            Log.e(TAG, "onBindViewHolder: View.GONE");
             holder.select.setVisibility(View.GONE);
             holder.appSize.setVisibility(View.VISIBLE);
         }
 
         //设置点击和长按事件
-        if (mItemClickListener != null) {
-//            Log.e("ListenerNormalMode", "onBindViewHolder: " );
+
             holder.itemView.setOnClickListener(view -> mItemClickListener.onItemClick(position));
-        }
-        if (mLongClickListener != null) {
+
             holder.itemView.setOnLongClickListener(view -> mLongClickListener.onLongClick(position));
-        }
+
 
     }
 
@@ -107,7 +108,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         private TextView appSize;
         private CheckBox select;
 
-        public MyViewHolder(View view) {
+        MyViewHolder(View view) {
             super(view);
             icon = view.findViewById(R.id.appimg);
             label = view.findViewById(R.id.appname);
