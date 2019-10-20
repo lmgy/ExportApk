@@ -8,7 +8,7 @@
     android:layout_marginRight="2dp"
     android:layout_marginLeft="2dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appinst"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
         android:orientation="horizontal"
         android:gravity="end|center">
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/showSystemAPP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="12dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/currentfile"
         android:layout_width="wrap_content"
         android:layout_height="49dp"
@@ -29,7 +29,7 @@
         android:layout_marginRight="16dp"
         android:progressDrawable="@drawable/progress_fund_detail" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/copyspeed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
         android:layout_marginTop="10dp"
         android:textSize="12sp" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/copyprogress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -16,7 +16,7 @@
         android:layout_marginRight="12dp"
         android:progressDrawable="@drawable/progress_fund_detail"/>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_loadlist_textview_percent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:layout_marginBottom="10dp"
         android:textSize="14sp" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_loadlist_textview_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

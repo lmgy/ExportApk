@@ -10,7 +10,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/text_selectall"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
@@ -21,7 +21,7 @@
             android:textSize="16sp"
             android:focusable="true" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/text_deselectall"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
             android:textSize="16sp"
             android:focusable="true" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/text_extract"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
             android:textSize="16sp"
             android:focusable="true" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/text_share"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
