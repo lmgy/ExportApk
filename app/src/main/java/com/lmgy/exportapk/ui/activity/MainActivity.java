@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,7 +63,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public boolean shareAfterExtract = false;
     public boolean showSystemApp = false;
-    public boolean isMultiSelectMode = false, isSearchMode = false;
+    private boolean isMultiSelectMode = false, isSearchMode = false;
 
     public LoadListDialog dialogLoadList;
     //    public FileCopyDialog dialogCopyFile;
@@ -75,7 +76,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public RecyclerView recyclerView;
     private AppListAdapter mAdapter;
 
-    //    private SearchTask runnableSearch;
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private CardView cardView;
@@ -255,7 +255,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
 
         mAdapter.setItemClickListener(new ListenerMultiSelectMode(this));
-//        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
 
         View multiSelectArea = findViewById(R.id.choice_app_view);
         findViewById(R.id.main_msg_view).setVisibility(View.GONE);
@@ -312,11 +312,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     this.keyword = keyword;
                     showSearchView();
                 });
-//                searchFragment.setOnBackClickListener(closeSearchView());
-//                Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
-//                cardView.startAnimation(anim);
-//                cardView.setVisibility(View.GONE);
-
+                Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
+                cardView.startAnimation(anim);
+                cardView.setVisibility(View.GONE);
                 break;
             case R.id.action_sort:
                 break;
@@ -333,13 +331,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void showSearchView(){
+    private void showSearchView() {
         updateSearchList(keyword);
         isSearchMode = true;
         mAdapter.setLongClickListener(null);
         setMenuVisible(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
     private void updateSearchList(String text) {
@@ -388,22 +385,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void closeSearchView() {
         isSearchMode = false;
-//        if (runnable_search != null) {
-//            runnable_search.setInterrupted();
-//        }
-//        if (this.thread_search != null) {
-//            thread_search.interrupt();
-//            thread_search = null;
-//        }
-
         mAdapter = new AppListAdapter(this, appItemBeanList);
         pg_search.setVisibility(View.GONE);
         recyclerView.setAdapter(mAdapter);
-//        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-//        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
+        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
         cardView.startAnimation(anim);
@@ -432,8 +420,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         deselectAll.setOnClickListener(null);
 
         mAdapter.cancelMutiSelectMode();
-//        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-//        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+        mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
+        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
 
         Animation animExit = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
         Animation animEntry = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
@@ -447,7 +435,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mainMsgView.startAnimation(animEntry);
         mainMsgView.setVisibility(View.VISIBLE);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        if (!isSearchMode) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
     }
 
     @SuppressLint("InflateParams")

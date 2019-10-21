@@ -20,7 +20,6 @@ public class ListenerOnLongClick implements AppListAdapter.OnLongClickListener {
 
     @Override
     public boolean onLongClick(int position) {
-        Log.e("AppListAdapter", "onLongClick: ListenerOnLongClick");
         activity.startMultiSelectMode(position);
         return false;
     }

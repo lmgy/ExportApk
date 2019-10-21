@@ -18,7 +18,7 @@
             android:clickable="true"
             android:text="@string/button_selectall"
             android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:focusable="true" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -29,7 +29,7 @@
             android:clickable="true"
             android:text="@string/button_deselectall"
             android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:focusable="true" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -40,7 +40,7 @@
             android:clickable="true"
             android:text="@string/button_extract"
             android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:focusable="true" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -51,7 +51,7 @@
             android:clickable="true"
             android:text="@string/button_share"
             android:textColor="@color/colorAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:focusable="true" />
 
     </LinearLayout>

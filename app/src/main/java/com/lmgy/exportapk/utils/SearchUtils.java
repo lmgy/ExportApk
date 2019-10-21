@@ -16,7 +16,7 @@ public class SearchUtils {
 
     public static Observable<List<AppItemBean>> getSearch(String info, List<AppItemBean> appItemBeanList) {
         String searchInfo = info.trim().toLowerCase(Locale.ENGLISH);
-        Observable<List<AppItemBean>> observable = Observable.create(emitter -> {
+        return Observable.create(emitter -> {
             List<AppItemBean> retList = new ArrayList<>();
             if (searchInfo.length() > 0) {
                 for (int i = 0; i < appItemBeanList.size(); i++) {
@@ -38,7 +38,6 @@ public class SearchUtils {
             emitter.onNext(retList);
             emitter.onComplete();
         });
-        return observable;
     }
 }
 
