@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,15 +34,18 @@ import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
+import com.lmgy.exportapk.listener.DialogClick;
 import com.lmgy.exportapk.listener.ListenerMultiSelectMode;
 import com.lmgy.exportapk.listener.ListenerNormalMode;
 import com.lmgy.exportapk.listener.ListenerOnLongClick;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.SearchUtils;
 import com.lmgy.exportapk.widget.LoadListDialog;
+import com.lmgy.exportapk.widget.SortDialog;
 import com.wyt.searchbox.SearchFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,7 +69,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public LoadListDialog dialogLoadList;
     //    public FileCopyDialog dialogCopyFile;
-//    public SortDialog dialogSort;
+    public SortDialog dialogSort;
     public AlertDialog dialogWait;
     private List<AppItemBean> appItemBeanList = new ArrayList<>();
     public List<AppItemBean> listExtractMulti = new ArrayList<>();
@@ -285,6 +287,50 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    private void clickActionSearch() {
+        isSearchMode = true;
+        if (isMultiSelectMode) {
+            closeMultiSelectMode();
+            Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
+            cardView.startAnimation(anim);
+            cardView.setVisibility(View.VISIBLE);
+        }
+        SearchFragment searchFragment = SearchFragment.newInstance();
+        searchFragment.showFragment(getSupportFragmentManager(), SearchFragment.TAG);
+        searchFragment.setOnSearchClickListener(keyword -> {
+            Toast.makeText(getBaseContext(), keyword, Toast.LENGTH_SHORT).show();
+            this.keyword = keyword;
+            showSearchView();
+        });
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
+        cardView.startAnimation(anim);
+        cardView.setVisibility(View.GONE);
+    }
+
+    private void clickActionSort() {
+        DialogClick click = position -> {
+            if (position == 0) {
+                if (isMultiSelectMode) {
+                    closeMultiSelectMode();
+                }
+                AppItemBean.SortConfig = 0;
+                recyclerView.setAdapter(null);
+                refreshList(true);
+                dialogSort.cancel();
+            } else {
+                dialogClick(position);
+            }
+        };
+        dialogSort = new SortDialog(this, click);
+        dialogSort.show();
+    }
+
+    private void dialogClick(int sortConfig) {
+        AppItemBean.SortConfig = sortConfig;
+        sortList();
+        dialogSort.cancel();
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -297,26 +343,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 backToParent();
                 break;
             case R.id.action_search:
-
-                isSearchMode = true;
-                if (isMultiSelectMode) {
-                    closeMultiSelectMode();
-                    Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-                    cardView.startAnimation(anim);
-                    cardView.setVisibility(View.VISIBLE);
-                }
-                SearchFragment searchFragment = SearchFragment.newInstance();
-                searchFragment.showFragment(getSupportFragmentManager(), SearchFragment.TAG);
-                searchFragment.setOnSearchClickListener(keyword -> {
-                    Toast.makeText(getBaseContext(), keyword, Toast.LENGTH_SHORT).show();
-                    this.keyword = keyword;
-                    showSearchView();
-                });
-                Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
-                cardView.startAnimation(anim);
-                cardView.setVisibility(View.GONE);
+                clickActionSearch();
                 break;
             case R.id.action_sort:
+                clickActionSort();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -328,6 +358,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             default:
                 break;
 
+        }
+    }
+
+    private void sortList() {
+        if (mAdapter != null && !isSearchMode) {
+            if (isMultiSelectMode) {
+                closeMultiSelectMode();
+            }
+            findViewById(R.id.showSystemAPP).setEnabled(false);
+            Collections.sort(appItemBeanList);
+            mAdapter = new AppListAdapter(this, appItemBeanList);
+            recyclerView.setAdapter(mAdapter);
+            mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
+            mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+            findViewById(R.id.showSystemAPP).setEnabled(true);
         }
     }
 
