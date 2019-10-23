@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.lmgy.exportapk.R;
+import com.lmgy.exportapk.listener.DialogClick;
 
 import java.util.Calendar;
 
@@ -54,6 +55,12 @@ public class AppDetailDialog extends BottomSheetDialog {
 
     public void setIcon(Drawable drawable) {
         appIcon.setImageDrawable(drawable);
+    }
+
+    public void setonClickListener(DialogClick dialogClick){
+        areaExtract.setOnClickListener(view -> dialogClick.onClick(1));
+        areaShare.setOnClickListener(view -> dialogClick.onClick(2));
+        areaDetail.setOnClickListener(view -> dialogClick.onClick(3));
     }
 
 
