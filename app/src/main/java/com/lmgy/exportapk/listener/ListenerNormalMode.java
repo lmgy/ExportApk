@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Message;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -18,10 +18,8 @@ import android.widget.Toast;
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.bean.AppItemBean;
-import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
-import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 import com.lmgy.exportapk.widget.AppDetailDialog;
 import com.lmgy.exportapk.widget.FileCopyDialog;
@@ -31,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -66,36 +62,11 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
             appDetailDialog.setTitle(item.getAppName());
             appDetailDialog.setIcon(item.getIcon());
 
-            DialogClick dialogClick = new DialogClick() {
-                @Override
-                public void onClick(int position) {
-                    if(position == 1){
-//                        appDetailDialog.cancel();
-//                        boolean data = ((CheckBox) appDetailDialog.findViewById(R.id.dialog_appdetail_extract_data_cb)).isChecked();
-//                        boolean obb = ((CheckBox) appDetailDialog.findViewById(R.id.dialog_appdetail_extract_obb_cb)).isChecked();
-//                        List<AppItemBean> selectedList = new ArrayList<>();
-//                        selectedList.add(item);
-//                        List<AppItemBean> listItem = new ArrayList<>();
-//                        listItem.add(mAdapter.getAppList().get(position));
-//                        String duplicate = FileUtils.getDuplicateFileInfo(mContext, listItem, (data || obb) ? "zip" : "apk");
-//                        if (duplicate.length() > 0) {
-//                            new AlertDialog.Builder(mContext)
-//                                    .setIcon(R.drawable.ic_icon_warn)
-//                                    .setTitle(mContext.getResources().getString(R.string.activity_main_duplicate_title))
-//                                    .setCancelable(true)
-//                                    .setMessage(mContext.getResources().getString(R.string.activity_main_duplicate_message) + "\n\n" + duplicate)
-//                                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
-//                                        extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
-//                                    })
-//                                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), (dialog, which) -> {
-//
-//                                    })
-//                                    .show();
-//
-//                        } else {
-//                            extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
-//                        }
-                    }else if(position == 2){
+            DialogClick dialogClick = position1 -> {
+                if (position1 == 1) {
+                    clickExtract(appDetailDialog, item, position);
+                } else if (position1 == 2) {
+                    clickShare();
 //                        appDetailDialog.cancel();
 //                        if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_DIRECT) {
 //                            clickShare(position);
@@ -104,9 +75,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 //                            listSingle.add(mAdapter.getAppList().get(position));
 //                            extractMultiSelectedApps(listSingle);
 //                        }
-                    }else {
-                        clickDetail(appDetailDialog, item);
-                    }
+                } else {
+                    clickDetail(appDetailDialog, item);
                 }
             };
 
@@ -116,7 +86,6 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                 appDetailDialog.setAPPMinSDKVersion(item.getMinSdkVersion());
             }
             appDetailDialog.show();
-
 
             calculateSize(item)
                     .subscribeOn(Schedulers.io())
@@ -154,7 +123,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         }
     }
 
-    private void clickDetail(AppDetailDialog appDetailDialog, AppItemBean item){
+    private void clickDetail(AppDetailDialog appDetailDialog, AppItemBean item) {
         if (appDetailDialog != null) {
             appDetailDialog.cancel();
         }
@@ -162,6 +131,35 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", item.getPackageName(), null));
         mContext.startActivity(intent);
+    }
+
+    private void clickExtract(AppDetailDialog appDetailDialog, AppItemBean item, int position) {
+        appDetailDialog.cancel();
+        boolean data = ((CheckBox) appDetailDialog.findViewById(R.id.dialog_appdetail_extract_data_cb)).isChecked();
+        boolean obb = ((CheckBox) appDetailDialog.findViewById(R.id.dialog_appdetail_extract_obb_cb)).isChecked();
+        List<AppItemBean> listItem = new ArrayList<>();
+        listItem.add(item);
+        String duplicate = FileUtils.getDuplicateFileInfo(mContext, listItem, (data || obb) ? "zip" : "apk");
+        if (duplicate.length() > 0) {
+            new AlertDialog.Builder(mContext)
+                    .setIcon(R.drawable.ic_icon_warn)
+                    .setTitle(mContext.getResources().getString(R.string.activity_main_duplicate_title))
+                    .setCancelable(true)
+                    .setMessage(mContext.getResources().getString(R.string.activity_main_duplicate_message) + "\n\n" + duplicate)
+                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
+                        extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
+                    })
+                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), (dialog, which) -> {
+
+                    })
+                    .show();
+        } else {
+            extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
+        }
+    }
+
+    private void clickShare() {
+
     }
 
     private void extractMultiSelectedApps(List<AppItemBean> extract_list) {
@@ -201,8 +199,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                 });
     }
 
-    private Observable<Long []> getExtractMulti(){
-        Observable<Long []> observable = Observable.create(emitter -> {
+    private Observable<Long[]> getExtractMulti() {
+        Observable<Long[]> observable = Observable.create(emitter -> {
             long data = 0, obb = 0;
             for (AppItemBean item : extractMultiList) {
                 long data_get = FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName));
@@ -222,7 +220,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         return observable;
     }
 
-    private void clickShare(int pos){
+    private void clickShare(int pos) {
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             List<AppItemBean> list = mAdapter.getAppList();
@@ -240,7 +238,11 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         }
     }
 
-    private void extractApp(Integer[] position){
+    private void extractApp(Integer[] position) {
+        Log.e(TAG, "extractApp: length = " + position.length);
+        for(int i: position){
+            Log.e(TAG, "extractApp: " + i );
+        }
         List<AppItemBean> list;
         if (mAdapter != null) {
             list = mAdapter.getAppList();
@@ -257,27 +259,28 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                     exportList.add(item);
                     mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
                     mThread = new Thread(mCopyFilesUtils);
-                    mFileCopyDialog = new FileCopyDialog(mContext);
-                    mFileCopyDialog.setCancelable(false);
-                    mFileCopyDialog.setCanceledOnTouchOutside(false);
-                    mFileCopyDialog.setMax(list.get(position[0]).getAppSize());
-                    mFileCopyDialog.setIcon(list.get(position[0]).getIcon());
-                    mFileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title));
-                    mFileCopyDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getResources().getString(R.string.activity_main_stop), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (mThread != null) {
-                                if (mCopyFilesUtils != null) {
-                                    mCopyFilesUtils.setInterrupted();
-                                }
-                                mThread.interrupt();
-                                mThread = null;
-                            }
-                            mFileCopyDialog.cancel();
-                            Toast.makeText(mContext, "已停止!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    mFileCopyDialog.show();
+//                    mFileCopyDialog = new FileCopyDialog(mContext);
+//                    mFileCopyDialog.setCancelable(false);
+//                    mFileCopyDialog.setCanceledOnTouchOutside(false);
+//                    mFileCopyDialog.setMax(list.get(position[0]).getAppSize());
+//                    mFileCopyDialog.setIcon(list.get(position[0]).getIcon());
+//                    mFileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title));
+//                    mFileCopyDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getResources().getString(R.string.activity_main_stop), new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            if (mThread != null) {
+//                                if (mCopyFilesUtils != null) {
+//                                    mCopyFilesUtils.setInterrupted();
+//                                }
+//                                mThread.interrupt();
+//                                mThread = null;
+//                            }
+//                            mFileCopyDialog.cancel();
+//                            Toast.makeText(mContext, "已停止!", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                    mFileCopyDialog.show();
+                    //TODO 需要把这个alertDialog添加到CopyFilesUtils
                     mThread.start();
                 }
             }

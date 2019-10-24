@@ -2,7 +2,13 @@ package com.lmgy.exportapk.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,73 +37,72 @@ import java.util.zip.ZipOutputStream;
  */
 public class CopyFilesUtils implements Runnable {
 
+    private static final String TAG = "CopyFilesUtils";
+
     private Context mContext;
-    private List<AppItemBean> applist;
-    private String savepath = Constant.PREFERENCE_SAVE_PATH_DEFAULT;
+    private List<AppItemBean> appList;
+    private String savePath = Constant.PREFERENCE_SAVE_PATH_DEFAULT;
     private String currentWritePath = null;
-    private boolean isInterrupted = false;
-    private long progress = 0, total = 0;
-    private long progress_check = 0;
-    private long zipTime = 0;
-    private long zipWriteLength_second = 0;
+    private boolean isInterrupted;
+    private long progress;
+    private long total;
+    private long progressCheck;
+    private long zipTime;
+    private long zipWriteLengthSecond;
     private FileCopyDialog fileCopyDialog;
-    private String errorMessage = "";
+    private String errorMessage;
     private boolean isExtractSuccess = true;
-    private boolean isSearchMode = false;
-    private boolean shareAfterExtract = false;
+
 
     private List<String> writePaths = new ArrayList<>();
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
 
     public CopyFilesUtils(List<AppItemBean> list, Context context) {
-        applist = list;
+        appList = list;
         this.mContext = context;
         fileCopyDialog = new FileCopyDialog(mContext);
         this.isInterrupted = false;
-        File initialpath = new File(this.savepath);
-        if (initialpath.exists() && !initialpath.isDirectory()) {
-            initialpath.delete();
+        File initialPath = new File(this.savePath);
+        if (initialPath.exists() && !initialPath.isDirectory()) {
+            initialPath.delete();
         }
-        if (!initialpath.exists()) {
-            initialpath.mkdirs();
+        if (!initialPath.exists()) {
+            initialPath.mkdirs();
         }
     }
 
     @Override
     public void run() {
         total = getTotalLength();
-        long bytetemp = 0;
+        long byteTemp = 0;
         long bytesPerSecond = 0;
         long startTime = System.currentTimeMillis();
-        for (int i = 0; i < this.applist.size(); i++) {
-            AppItemBean item = applist.get(i);
+        for (int i = 0; i < this.appList.size(); i++) {
+            AppItemBean item = appList.get(i);
             if (!this.isInterrupted) {
-                try {
-                    fileCopyDialog.setIcon(applist.get(i).icon);
-                    fileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title) + (i + 1) + "/" + applist.size() + " " + applist.get(i).appName);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                fileCopyDialog.setIcon(appList.get(i).icon);
+                fileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title) + (i + 1) + "/" + appList.size() + " " + appList.get(i).appName);
 
                 if ((!item.exportData) && (!item.exportObb)) {
-                    int byteread;
+                    int byteRead;
                     try {
                         String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "apk");
                         this.currentWritePath = writePath;
                         InputStream in = new FileInputStream(item.getPath());
                         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(writePath));
-                        String sendpath = writePath;
-                        if (sendpath.length() > 90) {
-                            sendpath = "..." + sendpath.substring(sendpath.length() - 90);
+                        String sendPath = writePath;
+                        if (sendPath.length() > 90) {
+                            sendPath = "..." + sendPath.substring(sendPath.length() - 90);
                         }
-                        String currentFile = mContext.getResources().getString(R.string.copytask_apk_current) + sendpath;
-                        ((TextView) fileCopyDialog.findViewById(R.id.currentfile)).setText(currentFile);
+                        String currentFile = mContext.getResources().getString(R.string.copytask_apk_current) + sendPath;
+                        mHandler.post(() -> fileCopyDialog.setTextAtt(currentFile));
 
                         byte[] buffer = new byte[1024 * 10];
-                        while ((byteread = in.read(buffer)) != -1 && !this.isInterrupted) {
-                            out.write(buffer, 0, byteread);
-                            progress += byteread;
-                            bytesPerSecond += byteread;
+                        while ((byteRead = in.read(buffer)) != -1 && !this.isInterrupted) {
+                            out.write(buffer, 0, byteRead);
+                            progress += byteRead;
+                            bytesPerSecond += byteRead;
                             long endTime = System.currentTimeMillis();
                             if ((endTime - startTime) > 1000) {
                                 startTime = endTime;
@@ -106,8 +111,8 @@ public class CopyFilesUtils implements Runnable {
                                 fileCopyDialog.setSpeed(speed);
                             }
 
-                            if ((progress - bytetemp) > 100 * 1024) {
-                                bytetemp = progress;
+                            if ((progress - byteTemp) > 100 * 1024) {
+                                byteTemp = progress;
                                 Long[] progressInfo = new Long[]{progress, total};
                                 fileCopyDialog.setMax(progressInfo[1]);
                                 fileCopyDialog.setProgress(progressInfo[0]);
@@ -119,6 +124,7 @@ public class CopyFilesUtils implements Runnable {
                         out.close();
                         writePaths.add(writePath);
                     } catch (Exception e) {
+                        Log.e(TAG, "error 2" );
                         e.printStackTrace();
                         try {
                             File file = new File(this.currentWritePath);
@@ -133,7 +139,6 @@ public class CopyFilesUtils implements Runnable {
 
                         isExtractSuccess = false;
                         errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
-
                     }
 
                 } else {
@@ -159,6 +164,7 @@ public class CopyFilesUtils implements Runnable {
                         zos.close();
                         writePaths.add(writePath);
                     } catch (Exception e) {
+                        Log.e(TAG, "error 3" );
                         e.printStackTrace();
                         try {
                             File file = new File(this.currentWritePath);
@@ -169,6 +175,7 @@ public class CopyFilesUtils implements Runnable {
                             ee.printStackTrace();
                         }
                         String filename = item.getAppName() + " " + item.getVersion();
+                        Log.e(TAG, "run: 2"  );
                         isExtractSuccess = false;
                         errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
 
@@ -185,56 +192,48 @@ public class CopyFilesUtils implements Runnable {
 
         if (!this.isInterrupted) {
             if (fileCopyDialog != null) {
-                fileCopyDialog.cancel();
+                fileCopyDialog.dismiss();
             }
 
             if (isExtractSuccess) {
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.activity_main_complete) + savepath, Toast.LENGTH_LONG).show();
+                mHandler.post(() -> Toast.makeText(mContext, mContext.getResources().getString(R.string.activity_main_complete) + savePath, Toast.LENGTH_LONG).show());
             }
-//            if (!isSearchMode) {
-//                Main.sendEmptyMessage(MESSAGE_SET_NORMAL_TEXT_ATT);
-//            }
 
             if (!isExtractSuccess) {
-                new AlertDialog.Builder(mContext).setTitle(mContext.getResources().getString(R.string.attention))
+                mHandler.post(() -> new AlertDialog.Builder(mContext).setTitle(mContext.getResources().getString(R.string.attention))
                         .setIcon(R.drawable.ic_icon_warn)
                         .setMessage(mContext.getResources().getString(R.string.activity_main_exception_head) + errorMessage + mContext.getResources().getString(R.string.activity_main_exception_end))
                         .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
                         })
-                        .show();
+                        .show());
             }
             isExtractSuccess = true;
             errorMessage = "";
-            //TODO 修复导出到文件夹的bug
-//            if (main.shareAfterExtract && settings.getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
-//                try {
-//                    List<String> paths = writePaths;
-//                    Intent i = new Intent();
-//                    i.setType("application/x-zip-compressed");
-//                    if (paths.size() == 1) {
-//                        i.setAction(Intent.ACTION_SEND);
-//                        Uri uri = Uri.fromFile(new File(paths.get(0)));
-//                        i.putExtra(Intent.EXTRA_STREAM, uri);
-//                    } else {
-//                        i.setAction(Intent.ACTION_SEND_MULTIPLE);
-//                        ArrayList<Uri> uris = new ArrayList<Uri>();
-//                        for (int n = 0; n < paths.size(); n++) {
-//                            uris.add(Uri.fromFile(new File(paths.get(n))));
-//                        }
-//                        i.putExtra(Intent.EXTRA_STREAM, uris);
-//                    }
-//                    i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
-//                    i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
-//                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
+                List<String> paths = writePaths;
+                Intent i = new Intent();
+                i.setType("application/x-zip-compressed");
+                if (paths.size() == 1) {
+                    i.setAction(Intent.ACTION_SEND);
+                    Uri uri = Uri.fromFile(new File(paths.get(0)));
+                    i.putExtra(Intent.EXTRA_STREAM, uri);
+                } else {
+                    i.setAction(Intent.ACTION_SEND_MULTIPLE);
+                    ArrayList<Uri> uris = new ArrayList<>();
+                    for (int n = 0; n < paths.size(); n++) {
+                        uris.add(Uri.fromFile(new File(paths.get(n))));
+                    }
+                    i.putExtra(Intent.EXTRA_STREAM, uris);
+                }
+                i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
+                i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
+            }
         }
     }
 
-    private void writeZip(File file, String parent, ZipOutputStream zos, final int zip_level) {
+    private void writeZip(File file, String parent, ZipOutputStream zos, int zipLevel) {
         if (file == null || parent == null || zos == null || isInterrupted) {
             return;
         }
@@ -244,7 +243,7 @@ public class CopyFilesUtils implements Runnable {
                 File files[] = file.listFiles();
                 if (files.length > 0) {
                     for (File f : files) {
-                        writeZip(f, parent, zos, zip_level);
+                        writeZip(f, parent, zos, zipLevel);
                     }
                 } else {
                     try {
@@ -258,7 +257,7 @@ public class CopyFilesUtils implements Runnable {
                     FileInputStream in = new FileInputStream(file);
                     ZipEntry zipentry = new ZipEntry(parent + file.getName());
 
-                    if (zip_level == Constant.ZIP_LEVEL_STORED) {
+                    if (zipLevel == Constant.ZIP_LEVEL_STORED) {
                         zipentry.setMethod(ZipEntry.STORED);
                         zipentry.setCompressedSize(file.length());
                         zipentry.setSize(file.length());
@@ -283,27 +282,24 @@ public class CopyFilesUtils implements Runnable {
                     while ((length = in.read(buffer)) != -1 && !isInterrupted) {
                         zos.write(buffer, 0, length);
                         this.progress += length;
-                        this.zipWriteLength_second += length;
+                        this.zipWriteLengthSecond += length;
                         Long endTime = System.currentTimeMillis();
                         if (endTime - this.zipTime > 1000) {
                             this.zipTime = endTime;
-                            long speed = zipWriteLength_second;
+                            long speed = zipWriteLengthSecond;
                             if (fileCopyDialog != null) {
                                 fileCopyDialog.setSpeed(speed);
                             }
-
-                            this.zipWriteLength_second = 0;
+                            this.zipWriteLengthSecond = 0;
                         }
-                        if (this.progress - progress_check > 100 * 1024) {
-                            progress_check = this.progress;
-
+                        if (this.progress - progressCheck > 100 * 1024) {
+                            progressCheck = this.progress;
                             Long[] progress = new Long[]{this.progress, this.total};
                             if (fileCopyDialog != null) {
                                 fileCopyDialog.setMax(progress[1]);
                                 fileCopyDialog.setProgress(progress[0]);
                             }
                         }
-
                     }
                     zos.flush();
                     in.close();
@@ -316,7 +312,7 @@ public class CopyFilesUtils implements Runnable {
 
     private long getTotalLength() {
         long total = 0;
-        for (AppItemBean item : applist) {
+        for (AppItemBean item : appList) {
             total += item.appSize;
             if (item.exportData) {
                 total += FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName));

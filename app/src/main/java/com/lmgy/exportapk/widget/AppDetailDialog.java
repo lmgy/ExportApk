@@ -1,5 +1,6 @@
 package com.lmgy.exportapk.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -30,7 +31,7 @@ public class AppDetailDialog extends BottomSheetDialog {
     private TextView appName;
     private ImageView appIcon;
 
-
+    @SuppressLint("InflateParams")
     public AppDetailDialog(@NonNull Context context, int theme) {
         super(context, theme);
         this.mContext = context;

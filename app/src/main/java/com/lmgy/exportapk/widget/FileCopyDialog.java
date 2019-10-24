@@ -42,7 +42,6 @@ public class FileCopyDialog extends AlertDialog {
         setMax((int) total / 1024);
     }
 
-
     public void setTextAtt(String title) {
         this.tvCurrentInfo.setText(title);
     }
