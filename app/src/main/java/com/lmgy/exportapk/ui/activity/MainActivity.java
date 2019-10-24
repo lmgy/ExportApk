@@ -403,7 +403,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         recyclerView.setAdapter(mAdapter);
                         mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
                         mAdapter.setLongClickListener(new ListenerOnLongClick((MainActivity) mContext));
-
                     }
 
                     @Override
