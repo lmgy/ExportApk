@@ -164,7 +164,7 @@ public class FolderSelectActivity extends BaseActivity {
         mSwipeRefreshLayout.setOnRefreshListener(() -> refreshList(false));
     }
 
-    private void clickActionNewFolder(){
+    private void clickActionNewFolder() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_newfolder, null);
         final AlertDialog newFolder = new AlertDialog.Builder(this)

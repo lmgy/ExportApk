@@ -84,13 +84,13 @@ public class FileUtils {
     public static String getAbsoluteWritePath(Context context, AppItemBean item, String extension) {
         try {
             if ("apk".equals(extension.toLowerCase(Locale.ENGLISH))) {
-                return SpUtils.getSavePath() + "/" + SpUtils.getFileNameFont().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+                return SpUtils.getSavePath() + "/" + SpUtils.getFontApk().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
                         .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
                         .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
                         .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".apk";
             }
             if ("zip".equals(extension.toLowerCase(Locale.ENGLISH))) {
-                return SpUtils.getSavePath() + "/" + SpUtils.getFileNameFont().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+                return SpUtils.getSavePath() + "/" + SpUtils.getFontZip().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
                         .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
                         .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
                         .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".zip";

@@ -12,6 +12,7 @@ import com.lmgy.exportapk.ui.activity.MainActivity;
 public class ListenerMultiSelectMode implements AppListAdapter.OnItemClickListener {
 
     private MainActivity activity;
+
     public ListenerMultiSelectMode(MainActivity activity) {
         this.activity = activity;
     }

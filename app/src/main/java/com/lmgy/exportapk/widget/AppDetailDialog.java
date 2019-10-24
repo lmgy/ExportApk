@@ -58,7 +58,7 @@ public class AppDetailDialog extends BottomSheetDialog {
         appIcon.setImageDrawable(drawable);
     }
 
-    public void setonClickListener(DialogClick dialogClick){
+    public void setonClickListener(DialogClick dialogClick) {
         areaExtract.setOnClickListener(view -> dialogClick.onClick(1));
         areaShare.setOnClickListener(view -> dialogClick.onClick(2));
         areaDetail.setOnClickListener(view -> dialogClick.onClick(3));

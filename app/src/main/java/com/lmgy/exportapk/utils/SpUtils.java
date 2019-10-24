@@ -29,9 +29,21 @@ public class SpUtils {
         editor.apply();
     }
 
-    public static String getFileNameFont(){
+    public static String getFontApk(){
         return settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK, Constant.PREFERENCE_FILENAME_FONT_DEFAULT);
     }
 
+    public static String getFontZip(){
+        return settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP, Constant.PREFERENCE_FILENAME_FONT_DEFAULT);
+    }
 
+    public static void setFontApk(String apk){
+        editor.putString(Constant.PREFERENCE_FILENAME_FONT_APK, apk);
+        editor.apply();
+    }
+
+    public static void setFontZip(String zip){
+        editor.putString(Constant.PREFERENCE_FILENAME_FONT_ZIP, zip);
+        editor.apply();
+    }
 }

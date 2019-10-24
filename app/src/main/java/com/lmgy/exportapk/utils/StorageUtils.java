@@ -1,12 +1,10 @@
 package com.lmgy.exportapk.utils;
 
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,8 +48,7 @@ public class StorageUtils {
                     String[] items = line.split(" ");
                     if (items.length > 1) {
                         String path = items[1].toLowerCase(Locale.getDefault());
-                        if (!path.toLowerCase(Locale.getDefault()).trim().equals(mainStorage))
-                        {
+                        if (!path.toLowerCase(Locale.getDefault()).trim().equals(mainStorage)) {
                             paths.add(path);
                         }
                     }

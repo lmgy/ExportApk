@@ -10,11 +10,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +22,7 @@ import com.lmgy.exportapk.adapter.SettingsListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.SettingsBean;
 import com.lmgy.exportapk.config.Constant;
+import com.lmgy.exportapk.utils.SpUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,14 +108,14 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
     }
 
     @SuppressLint("InflateParams")
-    private void clickExportRule(){
+    private void clickExportRule() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_filename, null);
         EditText editApk = dialogView.findViewById(R.id.filename_apk);
         EditText editZip = dialogView.findViewById(R.id.filename_zip);
         TextView preview = dialogView.findViewById(R.id.filename_preview);
 
-//        editApk.setText(settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK, Constant.PREFERENCE_FILENAME_FONT_DEFAULT));
-//        editZip.setText(settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP, Constant.PREFERENCE_FILENAME_FONT_DEFAULT));
+        editApk.setText(SpUtils.getFontApk());
+        editZip.setText(SpUtils.getFontZip());
         preview.setText(getFormatExportFileName(editApk.getText().toString(), editZip.getText().toString()));
 
         if (!editApk.getText().toString().contains(Constant.FONT_APP_NAME) && !editApk.getText().toString().contains(Constant.FONT_APP_PACKAGE_NAME)
@@ -156,30 +154,10 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
                     || zip_replaced_variables.contains("<") || zip_replaced_variables.contains(">") || zip_replaced_variables.contains("|")) {
                 Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_invalid_foldername), Toast.LENGTH_SHORT).show();
             }
-//            editor.putString(Constant.PREFERENCE_FILENAME_FONT_APK, editApk.getText().toString());
-//            editor.putString(Constant.PREFERENCE_FILENAME_FONT_ZIP, editZip.getText().toString());
-//            int zipSelection = spinner.getSelectedItemPosition();
-//            switch (zipSelection) {
-//                default:
-//                    break;
-//                case 0:
-//                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT);
-//                    break;
-//                case 1:
-//                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_STORED);
-//                    break;
-//                case 2:
-//                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_LOW);
-//                    break;
-//                case 3:
-//                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_NORMAL);
-//                    break;
-//                case 4:
-//                    editor.putInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.ZIP_LEVEL_HIGH);
-//                    break;
-//            }
-//            editor.apply();
-//            dialog.cancel();
+            SpUtils.setFontApk(editApk.getText().toString());
+            SpUtils.setFontZip(editZip.getText().toString());
+
+            dialog.cancel();
         });
         editApk.addTextChangedListener(new TextWatcher() {
 

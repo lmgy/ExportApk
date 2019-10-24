@@ -2,18 +2,15 @@ package com.lmgy.exportapk.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lmgy.exportapk.R;
-import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.widget.FileCopyDialog;
@@ -124,7 +121,7 @@ public class CopyFilesUtils implements Runnable {
                         out.close();
                         writePaths.add(writePath);
                     } catch (Exception e) {
-                        Log.e(TAG, "error 2" );
+                        Log.e(TAG, "error 2");
                         e.printStackTrace();
                         try {
                             File file = new File(this.currentWritePath);
@@ -164,7 +161,7 @@ public class CopyFilesUtils implements Runnable {
                         zos.close();
                         writePaths.add(writePath);
                     } catch (Exception e) {
-                        Log.e(TAG, "error 3" );
+                        Log.e(TAG, "error 3");
                         e.printStackTrace();
                         try {
                             File file = new File(this.currentWritePath);
@@ -175,7 +172,7 @@ public class CopyFilesUtils implements Runnable {
                             ee.printStackTrace();
                         }
                         String filename = item.getAppName() + " " + item.getVersion();
-                        Log.e(TAG, "run: 2"  );
+                        Log.e(TAG, "run: 2");
                         isExtractSuccess = false;
                         errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
 

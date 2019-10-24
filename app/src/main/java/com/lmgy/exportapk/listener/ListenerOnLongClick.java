@@ -1,8 +1,5 @@
 package com.lmgy.exportapk.listener;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.ui.activity.MainActivity;
 
@@ -14,7 +11,7 @@ public class ListenerOnLongClick implements AppListAdapter.OnLongClickListener {
 
     private MainActivity activity;
 
-    public ListenerOnLongClick(MainActivity activity){
+    public ListenerOnLongClick(MainActivity activity) {
         this.activity = activity;
     }
 

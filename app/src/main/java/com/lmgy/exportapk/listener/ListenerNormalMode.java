@@ -2,26 +2,19 @@ package com.lmgy.exportapk.listener;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Message;
 import android.provider.Settings;
 import android.text.format.Formatter;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.Toast;
 
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.bean.AppItemBean;
-import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
-import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 import com.lmgy.exportapk.widget.AppDetailDialog;
 import com.lmgy.exportapk.widget.FileCopyDialog;
@@ -134,7 +127,6 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         List<AppItemBean> listItem = new ArrayList<>();
         listItem.add(item);
         String duplicate = FileUtils.getDuplicateFileInfo(mContext, listItem, (data || obb) ? "zip" : "apk");
-        Log.e(TAG, "clickExtract: " + duplicate );
         if (duplicate.length() > 0) {
             new AlertDialog.Builder(mContext)
                     .setIcon(R.drawable.ic_icon_warn)
