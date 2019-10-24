@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Looper;
+import android.os.Message;
 import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -18,8 +18,10 @@ import android.widget.Toast;
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.bean.AppItemBean;
+import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
+import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 import com.lmgy.exportapk.widget.AppDetailDialog;
 import com.lmgy.exportapk.widget.FileCopyDialog;
@@ -47,6 +49,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
     private FileCopyDialog mFileCopyDialog;
     private Thread mThread;
     private List<AppItemBean> extractMultiList;
+    private AlertDialog dialogWait;
 
     public ListenerNormalMode(Context context, AppListAdapter adapter) {
         this.mContext = context;
@@ -66,15 +69,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                 if (position1 == 1) {
                     clickExtract(appDetailDialog, item, position);
                 } else if (position1 == 2) {
-                    clickShare();
-//                        appDetailDialog.cancel();
-//                        if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_DIRECT) {
-//                            clickShare(position);
-//                        } else if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
-//                            List<AppItemBean> listSingle = new ArrayList<>();
-//                            listSingle.add(mAdapter.getAppList().get(position));
-//                            extractMultiSelectedApps(listSingle);
-//                        }
+                    clickShare(appDetailDialog, position);
                 } else {
                     clickDetail(appDetailDialog, item);
                 }
@@ -158,8 +153,17 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         }
     }
 
-    private void clickShare() {
-
+    private void clickShare(AppDetailDialog appDetailDialog, int position) {
+        appDetailDialog.cancel();
+        if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_DIRECT) {
+            directShare(position);
+            Log.e(TAG, "clickShare: direct" );
+        } else if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
+            Log.e(TAG, "clickShare: not direct");
+            List<AppItemBean> listSingle = new ArrayList<>();
+            listSingle.add(mAdapter.getAppList().get(position));
+            extractMultiSelectedApps(listSingle);
+        }
     }
 
     private void extractMultiSelectedApps(List<AppItemBean> extract_list) {
@@ -168,11 +172,12 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
             list.add(new AppItemBean(extract_list.get(i)));
         }
         extractMultiList = list;
-        final AlertDialog dialog_wait = new AlertDialog.Builder(mContext)
+        dialogWait = new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getResources().getString(R.string.activity_main_wait))
                 .setView(LayoutInflater.from(mContext).inflate(R.layout.extract_multi_extra, null))
                 .setCancelable(false)
                 .show();
+
         getExtractMulti()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -185,6 +190,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                     @Override
                     public void onNext(Long[] values) {
                         Log.e(TAG, "onNext: ");
+                        showSelection(values);
                     }
 
                     @Override
@@ -197,6 +203,93 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
                     }
                 });
+    }
+
+    private void showSelection(Long[] values){
+        if (dialogWait == null) {
+            return;
+        }
+        dialogWait.cancel();
+        dialogWait = new AlertDialog.Builder(mContext)
+                .setTitle(mContext.getResources().getString(R.string.activity_main_extract_multi_additional_title))
+                .setView(LayoutInflater.from(mContext).inflate(R.layout.extract_multi_extra, null))
+                .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_continue), null)
+                .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), null)
+                .show();
+        CheckBox cbData = dialogWait.findViewById(R.id.extract_multi_data_cb);
+        CheckBox cbObb = dialogWait.findViewById(R.id.extract_multi_obb_cb);
+        cbData.setEnabled(values[0] > 0);
+        cbObb.setEnabled(values[1] > 0);
+        if (values[0] <= 0 && values[1] <= 0) {
+            dialogWait.cancel();
+            extractMultiApp();
+        } else {
+            dialogWait.findViewById(R.id.extract_multi_wait).setVisibility(View.GONE);
+            dialogWait.findViewById(R.id.extract_multi_selections).setVisibility(View.VISIBLE);
+            cbData.setText("Data(" + Formatter.formatFileSize(mContext, values[0]) + ")");
+            cbObb.setText("Obb(" + Formatter.formatFileSize(mContext, values[1]) + ")");
+            dialogWait.setCancelable(true);
+            dialogWait.setCanceledOnTouchOutside(true);
+            dialogWait.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+
+                dialogWait.cancel();
+                if (!cbData.isChecked()) {
+                    for (AppItemBean item : extractMultiList) {
+                        item.exportData = false;
+                    }
+                }
+                if (!cbObb.isChecked()) {
+                    for (AppItemBean item : extractMultiList) {
+                        item.exportObb = false;
+                    }
+                }
+                extractMultiApp();
+            });
+            dialogWait.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> dialogWait.cancel());
+        }
+    }
+
+    private void extractMultiApp(){
+        if (extractMultiList == null) {
+            return;
+        }
+        String msg_duplicate = "";
+        boolean isDuplicate = false;
+        for (AppItemBean item : extractMultiList) {
+            List<AppItemBean> checklist = new ArrayList<>();
+            checklist.add(item);
+            if (item.exportData || item.exportObb) {
+                String duplicate = FileUtils.getDuplicateFileInfo(mContext, checklist, "zip");
+                if (duplicate.length() > 0) {
+                    isDuplicate = true;
+                    msg_duplicate += duplicate;
+                }
+            } else {
+                String duplicate = FileUtils.getDuplicateFileInfo(mContext, checklist, "apk");
+                if (duplicate.length() > 0) {
+                    isDuplicate = true;
+                    msg_duplicate += duplicate;
+                }
+            }
+        }
+        if (isDuplicate) {
+            new AlertDialog.Builder(mContext)
+                    .setIcon(R.drawable.ic_icon_warn)
+                    .setTitle(mContext.getResources().getString(R.string.activity_main_duplicate_title))
+                    .setCancelable(true)
+                    .setMessage(mContext.getResources().getString(R.string.activity_main_duplicate_message) + "\n\n" + msg_duplicate)
+                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
+                        mCopyFilesUtils = new CopyFilesUtils(extractMultiList, mContext);
+                        mThread = new Thread(mCopyFilesUtils);
+                        mThread.start();
+                    })
+                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), (dialog, which) -> { })
+                    .show();
+        } else {
+            mCopyFilesUtils = new CopyFilesUtils(extractMultiList, mContext);
+            mThread = new Thread(mCopyFilesUtils);
+            mThread.start();
+        }
     }
 
     private Observable<Long[]> getExtractMulti() {
@@ -220,7 +313,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         return observable;
     }
 
-    private void clickShare(int pos) {
+    private void directShare(int pos) {
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             List<AppItemBean> list = mAdapter.getAppList();
@@ -240,8 +333,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
     private void extractApp(Integer[] position) {
         Log.e(TAG, "extractApp: length = " + position.length);
-        for(int i: position){
-            Log.e(TAG, "extractApp: " + i );
+        for (int i : position) {
+            Log.e(TAG, "extractApp: " + i);
         }
         List<AppItemBean> list;
         if (mAdapter != null) {
