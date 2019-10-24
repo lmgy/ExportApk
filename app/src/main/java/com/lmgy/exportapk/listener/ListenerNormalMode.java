@@ -114,7 +114,6 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
                         }
                     });
-
         }
     }
 
@@ -135,6 +134,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         List<AppItemBean> listItem = new ArrayList<>();
         listItem.add(item);
         String duplicate = FileUtils.getDuplicateFileInfo(mContext, listItem, (data || obb) ? "zip" : "apk");
+        Log.e(TAG, "clickExtract: " + duplicate );
         if (duplicate.length() > 0) {
             new AlertDialog.Builder(mContext)
                     .setIcon(R.drawable.ic_icon_warn)
@@ -155,162 +155,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
     private void clickShare(AppDetailDialog appDetailDialog, int position) {
         appDetailDialog.cancel();
-        if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_DIRECT) {
-            directShare(position);
-            Log.e(TAG, "clickShare: direct" );
-        } else if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
-            Log.e(TAG, "clickShare: not direct");
-            List<AppItemBean> listSingle = new ArrayList<>();
-            listSingle.add(mAdapter.getAppList().get(position));
-            extractMultiSelectedApps(listSingle);
-        }
-    }
-
-    private void extractMultiSelectedApps(List<AppItemBean> extract_list) {
-        List<AppItemBean> list = new ArrayList<>();
-        for (int i = 0; i < extract_list.size(); i++) {
-            list.add(new AppItemBean(extract_list.get(i)));
-        }
-        extractMultiList = list;
-        dialogWait = new AlertDialog.Builder(mContext)
-                .setTitle(mContext.getResources().getString(R.string.activity_main_wait))
-                .setView(LayoutInflater.from(mContext).inflate(R.layout.extract_multi_extra, null))
-                .setCancelable(false)
-                .show();
-
-        getExtractMulti()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Long[]>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(Long[] values) {
-                        Log.e(TAG, "onNext: ");
-                        showSelection(values);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    private void showSelection(Long[] values){
-        if (dialogWait == null) {
-            return;
-        }
-        dialogWait.cancel();
-        dialogWait = new AlertDialog.Builder(mContext)
-                .setTitle(mContext.getResources().getString(R.string.activity_main_extract_multi_additional_title))
-                .setView(LayoutInflater.from(mContext).inflate(R.layout.extract_multi_extra, null))
-                .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_continue), null)
-                .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), null)
-                .show();
-        CheckBox cbData = dialogWait.findViewById(R.id.extract_multi_data_cb);
-        CheckBox cbObb = dialogWait.findViewById(R.id.extract_multi_obb_cb);
-        cbData.setEnabled(values[0] > 0);
-        cbObb.setEnabled(values[1] > 0);
-        if (values[0] <= 0 && values[1] <= 0) {
-            dialogWait.cancel();
-            extractMultiApp();
-        } else {
-            dialogWait.findViewById(R.id.extract_multi_wait).setVisibility(View.GONE);
-            dialogWait.findViewById(R.id.extract_multi_selections).setVisibility(View.VISIBLE);
-            cbData.setText("Data(" + Formatter.formatFileSize(mContext, values[0]) + ")");
-            cbObb.setText("Obb(" + Formatter.formatFileSize(mContext, values[1]) + ")");
-            dialogWait.setCancelable(true);
-            dialogWait.setCanceledOnTouchOutside(true);
-            dialogWait.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-
-                dialogWait.cancel();
-                if (!cbData.isChecked()) {
-                    for (AppItemBean item : extractMultiList) {
-                        item.exportData = false;
-                    }
-                }
-                if (!cbObb.isChecked()) {
-                    for (AppItemBean item : extractMultiList) {
-                        item.exportObb = false;
-                    }
-                }
-                extractMultiApp();
-            });
-            dialogWait.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> dialogWait.cancel());
-        }
-    }
-
-    private void extractMultiApp(){
-        if (extractMultiList == null) {
-            return;
-        }
-        String msg_duplicate = "";
-        boolean isDuplicate = false;
-        for (AppItemBean item : extractMultiList) {
-            List<AppItemBean> checklist = new ArrayList<>();
-            checklist.add(item);
-            if (item.exportData || item.exportObb) {
-                String duplicate = FileUtils.getDuplicateFileInfo(mContext, checklist, "zip");
-                if (duplicate.length() > 0) {
-                    isDuplicate = true;
-                    msg_duplicate += duplicate;
-                }
-            } else {
-                String duplicate = FileUtils.getDuplicateFileInfo(mContext, checklist, "apk");
-                if (duplicate.length() > 0) {
-                    isDuplicate = true;
-                    msg_duplicate += duplicate;
-                }
-            }
-        }
-        if (isDuplicate) {
-            new AlertDialog.Builder(mContext)
-                    .setIcon(R.drawable.ic_icon_warn)
-                    .setTitle(mContext.getResources().getString(R.string.activity_main_duplicate_title))
-                    .setCancelable(true)
-                    .setMessage(mContext.getResources().getString(R.string.activity_main_duplicate_message) + "\n\n" + msg_duplicate)
-                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
-                        mCopyFilesUtils = new CopyFilesUtils(extractMultiList, mContext);
-                        mThread = new Thread(mCopyFilesUtils);
-                        mThread.start();
-                    })
-                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), (dialog, which) -> { })
-                    .show();
-        } else {
-            mCopyFilesUtils = new CopyFilesUtils(extractMultiList, mContext);
-            mThread = new Thread(mCopyFilesUtils);
-            mThread.start();
-        }
-    }
-
-    private Observable<Long[]> getExtractMulti() {
-        Observable<Long[]> observable = Observable.create(emitter -> {
-            long data = 0, obb = 0;
-            for (AppItemBean item : extractMultiList) {
-                long data_get = FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName));
-                long obb_get = FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName));
-                if (data_get > 0) {
-                    item.exportData = true;
-                }
-                if (obb_get > 0) {
-                    item.exportObb = true;
-                }
-                data += data_get;
-                obb += obb_get;
-            }
-            emitter.onNext(new Long[]{data, obb});
-            emitter.onComplete();
-        });
-        return observable;
+        directShare(position);
     }
 
     private void directShare(int pos) {
@@ -332,10 +177,6 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
     }
 
     private void extractApp(Integer[] position) {
-        Log.e(TAG, "extractApp: length = " + position.length);
-        for (int i : position) {
-            Log.e(TAG, "extractApp: " + i);
-        }
         List<AppItemBean> list;
         if (mAdapter != null) {
             list = mAdapter.getAppList();
@@ -390,6 +231,5 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         });
         return observable;
     }
-
 
 }

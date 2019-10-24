@@ -25,6 +25,7 @@ import com.lmgy.exportapk.adapter.FileListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.FileItemBean;
 import com.lmgy.exportapk.config.Constant;
+import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 
 import java.io.File;
@@ -65,7 +66,6 @@ public class FolderSelectActivity extends BaseActivity {
     @BindView(R.id.folderselector_refresharea)
     RelativeLayout mRlLoad;
 
-
     private File mPath;
     private FileListAdapter mAdapter;
     private List<FileItemBean> mFileList;
@@ -94,7 +94,7 @@ public class FolderSelectActivity extends BaseActivity {
 
     private void initData() {
         mFileList = new ArrayList<>();
-        mPath = new File(Constant.PREFERENCE_SAVE_PATH_DEFAULT);
+        mPath = new File(SpUtils.getSavePath());
         mAdapter = new FileListAdapter(mFileList, this);
         final String currentSelectedStoragePath = StorageUtils.getMainStoragePath();
         try {
@@ -132,7 +132,6 @@ public class FolderSelectActivity extends BaseActivity {
                         if (currentSelectedStoragePath.toLowerCase(Locale.getDefault()).trim().equals(((String) mSpinner.getSelectedItem()).toLowerCase(Locale.getDefault()).trim())) {
                             mPath = new File((String) mSpinner.getSelectedItem());
                         }
-//                        currentSelectedStoragePath = (String)mSpinner.getSelectedItem();
                         refreshList(true);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -218,14 +217,7 @@ public class FolderSelectActivity extends BaseActivity {
                 break;
             case R.id.folderselect_action_confirm:
                 String savePath = mPath.getAbsolutePath();
-//                try {
-//                    storage_path = ((String) ((Spinner) findViewById(R.id.folderselect_spinner)).getSelectedItem());
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                editor.putString(Constant.PREFERENCE_SAVE_PATH, savePath);
-//                editor.putString(Constant.PREFERENCE_STORAGE_PATH, storage_path);
-//                editor.apply();
+                SpUtils.setSavePath(savePath);
                 Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_saved_font) + savePath, Toast.LENGTH_SHORT).show();
                 finish();
                 break;
@@ -254,9 +246,7 @@ public class FolderSelectActivity extends BaseActivity {
                 clickActionNewFolder();
                 break;
             case R.id.folderselect_action_reset:
-//                savepath= Constant.PREFERENCE_SAVE_PATH_DEFAULT;
-//                editor.putString(Constant.PREFERENCE_SAVE_PATH, Constant.PREFERENCE_SAVE_PATH_DEFAULT);
-//                editor.apply();
+                SpUtils.setSavePath(Constant.PREFERENCE_SAVE_PATH_DEFAULT);
                 Toast.makeText(this, "默认路径: " + Constant.PREFERENCE_SAVE_PATH_DEFAULT, Toast.LENGTH_SHORT).show();
                 finish();
                 break;

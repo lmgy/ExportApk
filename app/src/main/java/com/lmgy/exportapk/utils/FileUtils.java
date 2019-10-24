@@ -1,8 +1,6 @@
 package com.lmgy.exportapk.utils;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
@@ -24,8 +22,7 @@ public class FileUtils {
             }
             if (!file.isDirectory()) {
                 return file.length();
-            }
-            else {
+            } else {
                 long total = 0;
                 File[] files = file.listFiles();
                 if (files == null || files.length == 0) {
@@ -86,17 +83,14 @@ public class FileUtils {
      */
     public static String getAbsoluteWritePath(Context context, AppItemBean item, String extension) {
         try {
-            SharedPreferences settings = context.getSharedPreferences(Constant.PREFERENCE_NAME, Activity.MODE_PRIVATE);
-            if (extension.toLowerCase(Locale.ENGLISH).equals("apk")) {
-                return Constant.PREFERENCE_SAVE_PATH_DEFAULT + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_APK,
-                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+            if ("apk".equals(extension.toLowerCase(Locale.ENGLISH))) {
+                return SpUtils.getSavePath() + "/" + SpUtils.getFileNameFont().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
                         .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
                         .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
                         .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".apk";
             }
-            if (extension.toLowerCase(Locale.ENGLISH).equals("zip")) {
-                return Constant.PREFERENCE_SAVE_PATH_DEFAULT + "/" + settings.getString(Constant.PREFERENCE_FILENAME_FONT_ZIP,
-                        Constant.PREFERENCE_FILENAME_FONT_DEFAULT).replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
+            if ("zip".equals(extension.toLowerCase(Locale.ENGLISH))) {
+                return SpUtils.getSavePath() + "/" + SpUtils.getFileNameFont().replace(Constant.FONT_APP_NAME, String.valueOf(item.appName))
                         .replace(Constant.FONT_APP_PACKAGE_NAME, String.valueOf(item.packageName))
                         .replace(Constant.FONT_APP_VERSIONCODE, String.valueOf(item.versioncode))
                         .replace(Constant.FONT_APP_VERSIONNAME, String.valueOf(item.version)) + ".zip";

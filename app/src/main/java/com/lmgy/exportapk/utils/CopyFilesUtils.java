@@ -209,27 +209,27 @@ public class CopyFilesUtils implements Runnable {
             }
             isExtractSuccess = true;
             errorMessage = "";
-            if (SpUtils.getSettings().getInt(Constant.PREFERENCE_SHAREMODE, Constant.PREFERENCE_SHAREMODE_DEFAULT) == Constant.SHARE_MODE_AFTER_EXTRACT) {
-                List<String> paths = writePaths;
-                Intent i = new Intent();
-                i.setType("application/x-zip-compressed");
-                if (paths.size() == 1) {
-                    i.setAction(Intent.ACTION_SEND);
-                    Uri uri = Uri.fromFile(new File(paths.get(0)));
-                    i.putExtra(Intent.EXTRA_STREAM, uri);
-                } else {
-                    i.setAction(Intent.ACTION_SEND_MULTIPLE);
-                    ArrayList<Uri> uris = new ArrayList<>();
-                    for (int n = 0; n < paths.size(); n++) {
-                        uris.add(Uri.fromFile(new File(paths.get(n))));
-                    }
-                    i.putExtra(Intent.EXTRA_STREAM, uris);
+
+            List<String> paths = writePaths;
+            Intent i = new Intent();
+            i.setType("application/x-zip-compressed");
+            if (paths.size() == 1) {
+                i.setAction(Intent.ACTION_SEND);
+                Uri uri = Uri.fromFile(new File(paths.get(0)));
+                i.putExtra(Intent.EXTRA_STREAM, uri);
+            } else {
+                i.setAction(Intent.ACTION_SEND_MULTIPLE);
+                ArrayList<Uri> uris = new ArrayList<>();
+                for (int n = 0; n < paths.size(); n++) {
+                    uris.add(Uri.fromFile(new File(paths.get(n))));
                 }
-                i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
-                i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
+                i.putExtra(Intent.EXTRA_STREAM, uris);
             }
+            i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
+            i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
+
         }
     }
 
