@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
  * @date 2019/10/17
  */
 public class FileCopyDialog extends AlertDialog {
+
     private ProgressBar progressBar;
     private TextView tvSpeed;
     private TextView tvProgress;
@@ -26,7 +27,6 @@ public class FileCopyDialog extends AlertDialog {
     private long progress = 0;
     private long total = 1024 * 100;
     private long speed = 0;
-    private int percent;
     private Context mContext;
 
     public FileCopyDialog(@NonNull Context context) {
@@ -65,10 +65,8 @@ public class FileCopyDialog extends AlertDialog {
         DecimalFormat dm = new DecimalFormat("#.00");
         int percent = (int) (Double.valueOf(dm.format((double) this.progress / this.total)) * 100);
         progressBar.setProgress((int) (progressOfBytes / 1024));
-        this.percent = percent;
         tvProgress.setText(Formatter.formatFileSize(mContext, this.progress) + "/" + Formatter
-                .formatFileSize(mContext, this.total) + "(" + this.percent + "%)");
-
+                .formatFileSize(mContext, this.total) + "(" + percent + "%)");
     }
 
     private void refreshSpeed() {

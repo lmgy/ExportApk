@@ -38,9 +38,14 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
     @BindView(R.id.listView)
     ListView mListView;
+    @BindView(R.id.filename_apk)
+    EditText editApk;
+    @BindView(R.id.filename_zip)
+    EditText editZip;
+    @BindView(R.id.filename_preview)
+    TextView preview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,9 +115,6 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
     @SuppressLint("InflateParams")
     private void clickExportRule() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_filename, null);
-        EditText editApk = dialogView.findViewById(R.id.filename_apk);
-        EditText editZip = dialogView.findViewById(R.id.filename_zip);
-        TextView preview = dialogView.findViewById(R.id.filename_preview);
 
         editApk.setText(SpUtils.getFontApk());
         editZip.setText(SpUtils.getFontZip());

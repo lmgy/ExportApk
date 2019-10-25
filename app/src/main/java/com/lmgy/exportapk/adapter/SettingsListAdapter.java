@@ -42,4 +42,5 @@ public class SettingsListAdapter extends ArrayAdapter<SettingsBean> {
         imageView.setImageResource(bean.getImage());
         return view;
     }
+
 }

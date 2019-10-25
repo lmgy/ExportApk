@@ -2,11 +2,8 @@ package com.lmgy.exportapk.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,11 +30,10 @@ import java.util.zip.ZipOutputStream;
  * @date 2019/10/17
  */
 public class CopyFilesUtils implements Runnable {
-    
+
     private Context mContext;
     private List<AppItemBean> appList;
-    private String savePath = Constant.PREFERENCE_SAVE_PATH_DEFAULT;
-    private String currentWritePath = null;
+    private String currentWritePath;
     private boolean isInterrupted;
     private long progress;
     private long total;
@@ -58,7 +54,7 @@ public class CopyFilesUtils implements Runnable {
         this.mContext = context;
         fileCopyDialog = new FileCopyDialog(mContext);
         this.isInterrupted = false;
-        File initialPath = new File(this.savePath);
+        File initialPath = new File(SpUtils.getSavePath());
         if (initialPath.exists() && !initialPath.isDirectory()) {
             initialPath.delete();
         }
@@ -67,13 +63,13 @@ public class CopyFilesUtils implements Runnable {
         }
     }
 
-    private void extractWithoutData(AppItemBean item){
+    private void extractWithoutData(AppItemBean item) {
         long byteTemp = 0;
         long bytesPerSecond = 0;
         long startTime = System.currentTimeMillis();
         int byteRead;
         try {
-            String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "apk");
+            String writePath = FileUtils.getAbsoluteWritePath(item, "apk");
             this.currentWritePath = writePath;
             InputStream in = new FileInputStream(item.getPath());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(writePath));
@@ -126,9 +122,9 @@ public class CopyFilesUtils implements Runnable {
         }
     }
 
-    private void extractWithData(AppItemBean item){
+    private void extractWithData(AppItemBean item) {
         try {
-            String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "zip");
+            String writePath = FileUtils.getAbsoluteWritePath(item, "zip");
             this.currentWritePath = writePath;
             ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(new File(writePath))));
             zos.setComment("Packaged by lmgy");
@@ -139,11 +135,11 @@ public class CopyFilesUtils implements Runnable {
             }
 
             writeZip(new File(item.getPath()), "", zos, zipLevel);
-            if (item.exportData) {
-                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName), "Android/data/", zos, zipLevel);
+            if (item.isExportData()) {
+                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.getPackageName()), "Android/data/", zos, zipLevel);
             }
-            if (item.exportObb) {
-                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName), "Android/obb/", zos, zipLevel);
+            if (item.isExportObb()) {
+                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.getPackageName()), "Android/obb/", zos, zipLevel);
             }
             zos.flush();
             zos.close();
@@ -173,10 +169,9 @@ public class CopyFilesUtils implements Runnable {
         for (int i = 0; i < this.appList.size(); i++) {
             AppItemBean item = appList.get(i);
             if (!this.isInterrupted) {
-                fileCopyDialog.setIcon(appList.get(i).icon);
-                fileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title) + (i + 1) + "/" + appList.size() + " " + appList.get(i).appName);
-
-                if ((!item.exportData) && (!item.exportObb)) {
+                fileCopyDialog.setIcon(appList.get(i).getIcon());
+                fileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title) + (i + 1) + "/" + appList.size() + " " + appList.get(i).getAppName());
+                if ((!item.isExportData()) && (!item.isExportObb())) {
                     extractWithoutData(item);
                 } else {
                     extractWithData(item);
@@ -192,7 +187,7 @@ public class CopyFilesUtils implements Runnable {
             }
 
             if (isExtractSuccess) {
-                mHandler.post(() -> Toast.makeText(mContext, mContext.getResources().getString(R.string.activity_main_complete) + savePath, Toast.LENGTH_LONG).show());
+                mHandler.post(() -> Toast.makeText(mContext, mContext.getResources().getString(R.string.activity_main_complete) + SpUtils.getSavePath(), Toast.LENGTH_LONG).show());
             }
 
             if (!isExtractSuccess) {
@@ -236,7 +231,7 @@ public class CopyFilesUtils implements Runnable {
         if (file.exists()) {
             if (file.isDirectory()) {
                 parent += file.getName() + File.separator;
-                File files[] = file.listFiles();
+                File[] files = file.listFiles();
                 if (files.length > 0) {
                     for (File f : files) {
                         writeZip(f, parent, zos, zipLevel);
@@ -263,7 +258,6 @@ public class CopyFilesUtils implements Runnable {
                     zos.putNextEntry(zipentry);
                     byte[] buffer = new byte[1024];
                     int length;
-
 
                     String currentPath = file.getAbsolutePath();
                     if (currentPath.length() > 90) {
@@ -309,12 +303,12 @@ public class CopyFilesUtils implements Runnable {
     private long getTotalLength() {
         long total = 0;
         for (AppItemBean item : appList) {
-            total += item.appSize;
-            if (item.exportData) {
-                total += FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName));
+            total += item.getAppSize();
+            if (item.isExportData()) {
+                total += FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.getPackageName()));
             }
-            if (item.exportObb) {
-                total += FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName));
+            if (item.isExportObb()) {
+                total += FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.getPackageName()));
             }
         }
         return total;

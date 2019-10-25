@@ -19,9 +19,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * @author lmgy
+ * @date 2019/10/19
+ */
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHolder> {
 
-    private static final String TAG = "AppListAdapter";
     private OnItemClickListener mItemClickListener;
     private OnLongClickListener mLongClickListener;
 
@@ -66,32 +69,28 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         holder.icon.setImageDrawable(item.getIcon());
         holder.label.setText(item.getAppName() + "(" + item.getVersion() + ")");
         holder.packageName.setText(item.getPackageName());
-        if (item.isSystemApp) {
+        if (item.isSystemApp()) {
             holder.label.setTextColor(context.getResources().getColor(R.color.color_text_darkred));
         } else {
             holder.label.setTextColor(context.getResources().getColor(R.color.color_text_black));
         }
         holder.appSize.setText(Formatter.formatFileSize(context, item.getAppSize()));
         if (this.isMultiSelectMode && this.isSelected != null) {
-            Log.e(TAG, "onBindViewHolder: View.VISIBLE");
             if (position < this.isSelected.length) {
-                Log.e(TAG, "onBindViewHolder: setcheck" );
                 holder.select.setChecked(this.isSelected[position]);
             }
             holder.select.setVisibility(View.VISIBLE);
             holder.appSize.setVisibility(View.GONE);
         } else {
-            Log.e(TAG, "onBindViewHolder: View.GONE");
             holder.select.setVisibility(View.GONE);
             holder.appSize.setVisibility(View.VISIBLE);
         }
 
         //设置点击和长按事件
 
-            holder.itemView.setOnClickListener(view -> mItemClickListener.onItemClick(position));
+        holder.itemView.setOnClickListener(view -> mItemClickListener.onItemClick(position));
 
-            holder.itemView.setOnLongClickListener(view -> mLongClickListener.onLongClick(position));
-
+        holder.itemView.setOnLongClickListener(view -> mLongClickListener.onLongClick(position));
 
     }
 
@@ -136,7 +135,6 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
             }
             this.notifyDataSetChanged();
         }
-
     }
 
     public void deselectAll() {

@@ -19,7 +19,6 @@ import java.util.List;
  * @date 2019/10/19
  */
 public class AboutListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = "AboutListAdapter";
     private Context mContext;
     private List<AboutBean> aboutBeanList;
 

@@ -35,7 +35,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
-    private static final String TAG = "ListenerNormalMode";
     private Context mContext;
     private AppListAdapter mAdapter;
     private CopyFilesUtils mCopyFilesUtils;
@@ -125,7 +124,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         boolean obb = ((CheckBox) appDetailDialog.findViewById(R.id.dialog_appdetail_extract_obb_cb)).isChecked();
         List<AppItemBean> listItem = new ArrayList<>();
         listItem.add(item);
-        String duplicate = FileUtils.getDuplicateFileInfo(mContext, listItem, (data || obb) ? "zip" : "apk");
+        String duplicate = FileUtils.getDuplicateFileInfo(listItem, (data || obb) ? "zip" : "apk");
         if (duplicate.length() > 0) {
             new AlertDialog.Builder(mContext)
                     .setIcon(R.drawable.ic_icon_warn)
@@ -171,10 +170,10 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                     List<AppItemBean> exportList = new ArrayList<>();
                     AppItemBean item = new AppItemBean(list.get(position[0]));
                     if (position[1] == 1) {
-                        item.exportData = true;
+                        item.setExportData(true);
                     }
                     if (position[2] == 1) {
-                        item.exportObb = true;
+                        item.setExportObb(true);
                     }
                     exportList.add(item);
                     mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
@@ -210,8 +209,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
     private Observable<List<Long>> calculateSize(AppItemBean item) {
         Observable<List<Long>> observable = Observable.create(emitter -> {
             List<Long> list = new ArrayList<>();
-            list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName)));
-            list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName)));
+            list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.getPackageName())));
+            list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.getPackageName())));
             emitter.onNext(list);
             emitter.onComplete();
         });

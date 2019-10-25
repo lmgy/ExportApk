@@ -24,10 +24,13 @@ import java.util.Calendar;
  * @date 2019/10/17
  */
 public class AppDetailDialog extends BottomSheetDialog {
+
     private TextView tvAtt;
-    private RelativeLayout areaExtract, areaShare, areaDetail;
+    private RelativeLayout areaExtract;
+    private RelativeLayout areaShare;
+    private RelativeLayout areaDetail;
     private Context mContext;
-    private String appInfo = "";
+    private String appInfo;
     private TextView appName;
     private ImageView appIcon;
 
@@ -64,9 +67,7 @@ public class AppDetailDialog extends BottomSheetDialog {
         areaDetail.setOnClickListener(view -> dialogClick.onClick(3));
     }
 
-
     public void setAppInfo(String version, int versioncode, long lastUpdateTime, long appSize) {
-
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(lastUpdateTime);
         int year = cal.get(Calendar.YEAR);
@@ -92,7 +93,6 @@ public class AppDetailDialog extends BottomSheetDialog {
         }
         return s;
     }
-
 
     public void setAPPMinSDKVersion(int version) {
         if (Build.VERSION.SDK_INT >= 24) {
@@ -184,7 +184,6 @@ public class AppDetailDialog extends BottomSheetDialog {
                     break;
                 //the newest api now is 27 before I wrote this program
             }
-
             tvAtt.setText(appInfo);
         }
     }

@@ -4,22 +4,26 @@ import android.graphics.drawable.Drawable;
 
 import com.lmgy.exportapk.utils.PinYinUtils;
 
+/**
+ * @author lmgy
+ * @date 2019/10/19
+ */
 public class AppItemBean implements Comparable<AppItemBean> {
 
     public static int SortConfig = 0;
 
-    public String appName = "";
-    public String packageName = "";
-    public Drawable icon;
-    public long appSize = 0;
-    public String path = "";
-    public String version = "";
-    public int versioncode = 0;
-    public long lastUpdateTime = 0;
-    public int minSdkVersion = 0;
-    public boolean exportData = false;
-    public boolean exportObb = false;
-    public boolean isSystemApp = false;
+    private String appName;
+    private String packageName;
+    private Drawable icon;
+    private long appSize;
+    private String path;
+    private String version;
+    private int versioncode;
+    private long lastUpdateTime;
+    private int minSdkVersion;
+    private boolean exportData;
+    private boolean exportObb;
+    private boolean isSystemApp = false;
 
     public AppItemBean() {
     }

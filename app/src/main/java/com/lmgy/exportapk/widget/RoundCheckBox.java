@@ -25,5 +25,4 @@ public class RoundCheckBox extends AppCompatCheckBox {
         super(context, attrs, defStyleAttr);
     }
 
-
 }

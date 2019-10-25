@@ -23,9 +23,7 @@ import androidx.appcompat.widget.AppCompatImageView;
  */
 public class CircleImageView extends AppCompatImageView {
 
-    private Paint mPaint;
     private int mRadius;
-    private float mScale;
 
     public CircleImageView(Context context) {
         super(context);
@@ -69,24 +67,29 @@ public class CircleImageView extends AppCompatImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         Bitmap bitmap;
-        mPaint = new Paint();
+        Paint mPaint = new Paint();
         Drawable drawable = getDrawable();
 
         if (null != drawable) {
-            bitmap = getIconBitmap(drawable);
-            //初始化BitmapShader，传入bitmap对象
-            BitmapShader bitmapShader;
-            if (bitmap != null) {
-                bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-                //计算缩放比例
-                mScale = (mRadius * 2.0f) / Math.min(bitmap.getHeight(), bitmap.getWidth());
-                Matrix matrix = new Matrix();
-                matrix.setScale(mScale, mScale);
-                bitmapShader.setLocalMatrix(matrix);
-                mPaint.setShader(bitmapShader);
-                //画圆形，指定好坐标，半径，画笔
-                canvas.drawCircle(mRadius, mRadius, mRadius, mPaint);
+            try {
+                bitmap = getIconBitmap(drawable);
+                //初始化BitmapShader，传入bitmap对象
+                BitmapShader bitmapShader;
+                if (bitmap != null) {
+                    bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+                    //计算缩放比例
+                    float mScale = (mRadius * 2.0f) / Math.min(bitmap.getHeight(), bitmap.getWidth());
+                    Matrix matrix = new Matrix();
+                    matrix.setScale(mScale, mScale);
+                    bitmapShader.setLocalMatrix(matrix);
+                    mPaint.setShader(bitmapShader);
+                    //画圆形，指定好坐标，半径，画笔
+                    canvas.drawCircle(mRadius, mRadius, mRadius, mPaint);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         } else {
             super.onDraw(canvas);
         }

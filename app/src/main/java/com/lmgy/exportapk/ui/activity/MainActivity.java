@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.Formatter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +35,6 @@ import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
-import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.listener.DialogClick;
 import com.lmgy.exportapk.listener.ListenerMultiSelectMode;
 import com.lmgy.exportapk.listener.ListenerNormalMode;
@@ -43,7 +42,6 @@ import com.lmgy.exportapk.listener.ListenerOnLongClick;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.SearchUtils;
-import com.lmgy.exportapk.widget.FileCopyDialog;
 import com.lmgy.exportapk.widget.LoadListDialog;
 import com.lmgy.exportapk.widget.SortDialog;
 import com.wyt.searchbox.SearchFragment;
@@ -68,10 +66,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    public AlertDialog dialogWait;
-    private List<AppItemBean> appItemBeanList = new ArrayList<>();
-    public List<AppItemBean> listExtractMulti = new ArrayList<>();
-
     @BindView(R.id.rv_main)
     RecyclerView mRecyclerView;
     @BindView(R.id.toolbar)
@@ -82,6 +76,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     CardView mCardView;
     @BindView(R.id.progressbar_search)
     ProgressBar mProgressBar;
+    @BindView(R.id.showSystemAPP)
+    CheckBox mCheckBox;
+    @BindView(R.id.text_selectall)
+    TextView mSelectAll;
+    @BindView(R.id.text_deselectall)
+    TextView mDeselectAll;
+    @BindView(R.id.text_extract)
+    TextView mExtract;
+    @BindView(R.id.text_share)
+    TextView mShare;
 
     private boolean showSystemApp = false;
     private boolean isMultiSelectMode = false;
@@ -90,10 +94,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Menu menu;
     private String keyword;
     private LoadListDialog mDialogLoadList;
-    private SortDialog dialogSort;
-    private CopyFilesUtils mCopyFilesUtils;
-    private FileCopyDialog mFileCopyDialog;
-    private Thread mThread;
+    private SortDialog mDialogSort;
+    private List<AppItemBean> appItemBeanList = new ArrayList<>();
     private Handler mHandler;
     private Context mContext;
 
@@ -109,7 +111,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDialogLoadList.setCanceledOnTouchOutside(false);
         mDialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
 
-        refreshList(true);
+        refreshList();
     }
 
     @Override
@@ -128,13 +130,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         setSupportActionBar(mToolbar);
         mFab.setOnClickListener(this);
+
+        mCheckBox.setOnCheckedChangeListener((button, isChecked) -> {
+            if (isMultiSelectMode) {
+                closeMultiSelectMode();
+            }
+            showSystemApp = isChecked;
+            refreshList();
+        });
     }
 
 
-    private void refreshList(boolean isShowProcessDialog) {
+    private void refreshList() {
         mRecyclerView.setAdapter(null);
-        findViewById(R.id.showSystemAPP).setEnabled(false);
-        if (mDialogLoadList != null && isShowProcessDialog) {
+        if (mDialogLoadList != null) {
             mDialogLoadList.show();
         }
         getObservable().subscribeOn(Schedulers.io())
@@ -167,10 +176,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private Observable<List<AppItemBean>> getObservable() {
-        Observable<List<AppItemBean>> observable = Observable.create(emitter -> {
+        return Observable.create(emitter -> {
             PackageManager packagemanager = getPackageManager();
             List<PackageInfo> packageList = packagemanager.getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
-            List<AppItemBean> appItemBeanList = new ArrayList<>();
+            List<AppItemBean> appItemBeanList1 = new ArrayList<>();
             for (int i = 0; i < packageList.size(); i++) {
                 PackageInfo pak = packageList.get(i);
                 AppItemBean appItem = new AppItemBean();
@@ -187,7 +196,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         if (Build.VERSION.SDK_INT >= 24) {
                             appItem.setMinSdkVersion(pak.applicationInfo.minSdkVersion);
                         }
-                        appItemBeanList.add(appItem);
+                        appItemBeanList1.add(appItem);
                     }
                 } else {
                     appItem.setIcon(packagemanager.getApplicationIcon(pak.applicationInfo));
@@ -202,38 +211,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         appItem.setMinSdkVersion(pak.applicationInfo.minSdkVersion);
                     }
                     if ((pak.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) > 0) {
-                        appItem.isSystemApp = true;
+                        appItem.setSystemApp(true);
                     }
-                    appItemBeanList.add(appItem);
+                    appItemBeanList1.add(appItem);
                 }
                 final int process = i + 1;
                 mHandler.post(() -> mDialogLoadList.setProgress(process));
             }
-            emitter.onNext(appItemBeanList);
+            emitter.onNext(appItemBeanList1);
             emitter.onComplete();
         });
-        return observable;
     }
 
     public void updateMultiSelectMode(int position) {
-        TextView app_inst = findViewById(R.id.appinst);
-        TextView extract = findViewById(R.id.text_extract);
-        TextView share = findViewById(R.id.text_share);
         mAdapter.onItemClicked(position);
-        app_inst.setText(getResources().getString(R.string.activity_main_multiselect_att_head) + mAdapter.getSelectedNum() + getResources().getString(R.string.activity_main_multiselect_att_item)
-                + "\n" + getResources().getString(R.string.activity_main_multiselect_att_end)
-                + Formatter.formatFileSize(mContext, mAdapter.getSelectedAppsSize()));
-        extract.setText(getResources().getString(R.string.button_extract) + "(" + mAdapter.getSelectedNum() + ")");
-        share.setText(getResources().getString(R.string.button_share) + "(" + mAdapter.getSelectedNum() + ")");
+        mExtract.setText(getResources().getString(R.string.button_extract) + "(" + mAdapter.getSelectedNum() + ")");
+        mShare.setText(getResources().getString(R.string.button_share) + "(" + mAdapter.getSelectedNum() + ")");
 
         if (mAdapter.getSelectedNum() > 0) {
-            extract.setClickable(true);
-            share.setClickable(true);
-            extract.setOnClickListener(this);
-            share.setOnClickListener(this);
+            mExtract.setClickable(true);
+            mShare.setClickable(true);
+            mExtract.setOnClickListener(this);
+            mShare.setOnClickListener(this);
         } else {
-            share.setOnClickListener(null);
-            extract.setOnClickListener(null);
+            mShare.setOnClickListener(null);
+            mExtract.setOnClickListener(null);
         }
     }
 
@@ -244,17 +246,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mAdapter.setMultiSelectMode();
         updateMultiSelectMode(position);
 
-        TextView selectAll = findViewById(R.id.text_selectall);
-        TextView deselectAll = findViewById(R.id.text_deselectall);
-
-        selectAll.setClickable(true);
-        selectAll.setOnClickListener(v -> {
+        mSelectAll.setClickable(true);
+        mSelectAll.setOnClickListener(v -> {
             mAdapter.selectAll();
             updateMultiSelectMode(-1);
         });
 
-        deselectAll.setClickable(true);
-        deselectAll.setOnClickListener(v -> {
+        mDeselectAll.setClickable(true);
+        mDeselectAll.setOnClickListener(v -> {
             mAdapter.deselectAll();
             updateMultiSelectMode(-1);
         });
@@ -318,20 +317,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 AppItemBean.SortConfig = 0;
                 mRecyclerView.setAdapter(null);
-                refreshList(true);
-                dialogSort.cancel();
+                refreshList();
+                mDialogSort.cancel();
             } else {
                 dialogClick(position);
             }
         };
-        dialogSort = new SortDialog(this, click);
-        dialogSort.show();
+        mDialogSort = new SortDialog(this, click);
+        mDialogSort.show();
     }
 
     private void dialogClick(int sortConfig) {
         AppItemBean.SortConfig = sortConfig;
         sortList();
-        dialogSort.cancel();
+        mDialogSort.cancel();
     }
 
     @Override
@@ -384,7 +383,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 if (isSearchMode) {
                     updateSearchList(keyword);
                 } else {
-                    refreshList(true);
+                    refreshList();
                 }
                 break;
         }
@@ -408,7 +407,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-
     private void extractApp(Integer[] position) {
         List<AppItemBean> list;
         if (mAdapter != null) {
@@ -418,33 +416,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     List<AppItemBean> exportList = new ArrayList<>();
                     AppItemBean item = new AppItemBean(list.get(position[0]));
                     if (position[1] == 1) {
-                        item.exportData = true;
+                        item.setExportData(true);
                     }
                     if (position[2] == 1) {
-                        item.exportObb = true;
+                        item.setExportObb(true);
                     }
                     exportList.add(item);
-                    mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
-                    mThread = new Thread(mCopyFilesUtils);
+                    CopyFilesUtils mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
+                    Thread mThread = new Thread(mCopyFilesUtils);
                     mThread.start();
                 }
             }
         }
     }
 
-
     private void sortList() {
         if (mAdapter != null && !isSearchMode) {
             if (isMultiSelectMode) {
                 closeMultiSelectMode();
             }
-            findViewById(R.id.showSystemAPP).setEnabled(false);
             Collections.sort(appItemBeanList);
             mAdapter = new AppListAdapter(this, appItemBeanList);
             mRecyclerView.setAdapter(mAdapter);
             mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
             mAdapter.setLongClickListener(new ListenerOnLongClick(this));
-            findViewById(R.id.showSystemAPP).setEnabled(true);
         }
     }
 
@@ -458,8 +453,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void updateSearchList(String text) {
         String searchInfo = text.trim().toLowerCase(Locale.ENGLISH);
-        findViewById(R.id.progressbar_search).setVisibility(View.VISIBLE);
-        ((RecyclerView) findViewById(R.id.rv_main)).setAdapter(mAdapter);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mRecyclerView.setAdapter(mAdapter);
         SearchUtils.getSearch(searchInfo, appItemBeanList)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -484,11 +479,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onComplete() {
-                        findViewById(R.id.progressbar_search).setVisibility(View.GONE);
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 });
     }
-
 
     private void setMenuVisible(boolean isVisible) {
         if (this.menu != null) {
@@ -515,7 +509,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setMenuVisible(true);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -523,17 +516,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         return true;
     }
 
-
     public void closeMultiSelectMode() {
-        TextView extract = findViewById(R.id.text_extract);
-        TextView share = findViewById(R.id.text_share);
-        TextView selectAll = findViewById(R.id.text_selectall);
-        TextView deselectAll = findViewById(R.id.text_deselectall);
         isMultiSelectMode = false;
-        extract.setOnClickListener(null);
-        share.setOnClickListener(null);
-        selectAll.setOnClickListener(null);
-        deselectAll.setOnClickListener(null);
+        mExtract.setOnClickListener(null);
+        mShare.setOnClickListener(null);
+        mSelectAll.setOnClickListener(null);
+        mDeselectAll.setOnClickListener(null);
 
         mAdapter.cancelMutiSelectMode();
         mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));

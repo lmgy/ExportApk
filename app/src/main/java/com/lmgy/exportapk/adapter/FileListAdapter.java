@@ -21,7 +21,7 @@ public class FileListAdapter extends BaseAdapter {
 
     private List<FileItemBean> list;
     private LayoutInflater inflater;
-    private int selectedPosition = -1;
+    private int selectedPosition;
 
     private onRadioButtonClickedListener monRadioButtonClicked;
 
@@ -94,7 +94,6 @@ public class FileListAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
-        //	ImageView img;
         TextView tvFileName;
         RadioButton raSelect;
     }
