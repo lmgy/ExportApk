@@ -62,9 +62,11 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                 if (position1 == 1) {
                     clickExtract(appDetailDialog, item, position);
                 } else if (position1 == 2) {
-                    clickShare(appDetailDialog, position);
+                    appDetailDialog.cancel();
+                    clickShare(position);
                 } else {
-                    clickDetail(appDetailDialog, item);
+                    appDetailDialog.cancel();
+                    clickDetail(item);
                 }
             };
 
@@ -110,10 +112,7 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         }
     }
 
-    private void clickDetail(AppDetailDialog appDetailDialog, AppItemBean item) {
-        if (appDetailDialog != null) {
-            appDetailDialog.cancel();
-        }
+    private void clickDetail(AppItemBean item) {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", item.getPackageName(), null));
@@ -145,24 +144,19 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
         }
     }
 
-    private void clickShare(AppDetailDialog appDetailDialog, int position) {
-        appDetailDialog.cancel();
-        directShare(position);
-    }
-
-    private void directShare(int pos) {
+    private void clickShare(int position) {
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             List<AppItemBean> list = mAdapter.getAppList();
-            String apkPath = list.get(pos).getPath();
+            String apkPath = list.get(position).getPath();
             File apk = new File(apkPath);
             Uri uri = Uri.fromFile(apk);
             intent.setType("application/vnd.android.package-archive");
             intent.putExtra(Intent.EXTRA_STREAM, uri);
-            intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share) + list.get(pos).getAppName());
-            intent.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share) + list.get(pos).getAppName());
+            intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share) + list.get(position).getAppName());
+            intent.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share) + list.get(position).getAppName());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(Intent.createChooser(intent, mContext.getResources().getString(R.string.share) + list.get(pos).getAppName()));
+            mContext.startActivity(Intent.createChooser(intent, mContext.getResources().getString(R.string.share) + list.get(position).getAppName()));
         } catch (Exception e) {
             e.printStackTrace();
         }

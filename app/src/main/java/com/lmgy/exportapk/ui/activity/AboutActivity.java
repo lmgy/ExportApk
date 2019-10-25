@@ -63,6 +63,7 @@ public class AboutActivity extends BaseActivity {
         aboutBeanList.add(new AboutBean("AndroidX", "https://source.google.com"));
         aboutBeanList.add(new AboutBean("Butterknife", "https://github.com/JakeWharton/butterknife"));
         aboutBeanList.add(new AboutBean("Rxjava", "https://github.com/ReactiveX/RxJava"));
+        aboutBeanList.add(new AboutBean("SearchDialog", "https://github.com/wenwenwen888/SearchDialog"));
         AboutListAdapter adapter = new AboutListAdapter(this, aboutBeanList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(adapter);

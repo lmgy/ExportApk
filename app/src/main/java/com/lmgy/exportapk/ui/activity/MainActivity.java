@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,22 +35,26 @@ import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
+import com.lmgy.exportapk.config.Constant;
 import com.lmgy.exportapk.listener.DialogClick;
 import com.lmgy.exportapk.listener.ListenerMultiSelectMode;
 import com.lmgy.exportapk.listener.ListenerNormalMode;
 import com.lmgy.exportapk.listener.ListenerOnLongClick;
+import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.SearchUtils;
+import com.lmgy.exportapk.widget.FileCopyDialog;
 import com.lmgy.exportapk.widget.LoadListDialog;
 import com.lmgy.exportapk.widget.SortDialog;
 import com.wyt.searchbox.SearchFragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.ButterKnife;
+import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -63,28 +68,32 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    public boolean shareAfterExtract = false;
-    public boolean showSystemApp = false;
-    private boolean isMultiSelectMode = false, isSearchMode = false;
-
-    public LoadListDialog dialogLoadList;
-    //    public FileCopyDialog dialogCopyFile;
-    public SortDialog dialogSort;
     public AlertDialog dialogWait;
     private List<AppItemBean> appItemBeanList = new ArrayList<>();
     public List<AppItemBean> listExtractMulti = new ArrayList<>();
-    public Thread threadAppInfo, threadSearch, threadExtractApp;
-    //    public CopyFilesTask runnableExtractApp;
-    public RecyclerView recyclerView;
+
+    @BindView(R.id.rv_main)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
+    @BindView(R.id.card_bar)
+    CardView mCardView;
+    @BindView(R.id.progressbar_search)
+    ProgressBar mProgressBar;
+
+    private boolean showSystemApp = false;
+    private boolean isMultiSelectMode = false;
+    private boolean isSearchMode = false;
     private AppListAdapter mAdapter;
-
-    private Toolbar toolbar;
-    private FloatingActionButton fab;
-    private CardView cardView;
     private Menu menu;
-    private ProgressBar pg_search;
     private String keyword;
-
+    private LoadListDialog mDialogLoadList;
+    private SortDialog dialogSort;
+    private CopyFilesUtils mCopyFilesUtils;
+    private FileCopyDialog mFileCopyDialog;
+    private Thread mThread;
     private Handler mHandler;
     private Context mContext;
 
@@ -93,13 +102,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         mHandler = new Handler(getMainLooper());
         mContext = this;
-        ButterKnife.bind(this);
 
-        dialogLoadList = new LoadListDialog(this);
-        dialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
-        dialogLoadList.setCancelable(false);
-        dialogLoadList.setCanceledOnTouchOutside(false);
-        dialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
+        mDialogLoadList = new LoadListDialog(this);
+        mDialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
+        mDialogLoadList.setCancelable(false);
+        mDialogLoadList.setCanceledOnTouchOutside(false);
+        mDialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
 
         refreshList(true);
     }
@@ -111,28 +119,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initView() {
-        toolbar = findViewById(R.id.toolbar);
-        fab = findViewById(R.id.fab);
-        recyclerView = findViewById(R.id.rv_main);
-        cardView = findViewById(R.id.card_bar);
-        pg_search = findViewById(R.id.progressbar_search);
         findViewById(R.id.choice_app_view).setVisibility(View.GONE);
         findViewById(R.id.main_msg_view).setVisibility(View.VISIBLE);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
 
-        setSupportActionBar(toolbar);
-        fab.setOnClickListener(this);
+        setSupportActionBar(mToolbar);
+        mFab.setOnClickListener(this);
     }
 
 
     private void refreshList(boolean isShowProcessDialog) {
-        recyclerView.setAdapter(null);
+        mRecyclerView.setAdapter(null);
         findViewById(R.id.showSystemAPP).setEnabled(false);
-        if (dialogLoadList != null && isShowProcessDialog) {
-            dialogLoadList.show();
+        if (mDialogLoadList != null && isShowProcessDialog) {
+            mDialogLoadList.show();
         }
         getObservable().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -146,7 +149,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void onNext(List<AppItemBean> appItemBeans) {
                         appItemBeanList = appItemBeans;
                         mAdapter = new AppListAdapter(getApplicationContext(), appItemBeans);
-                        recyclerView.setAdapter(mAdapter);
+                        mRecyclerView.setAdapter(mAdapter);
                     }
 
                     @Override
@@ -156,7 +159,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onComplete() {
-                        dialogLoadList.cancel();
+                        mDialogLoadList.cancel();
                         mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
                         mAdapter.setLongClickListener(new ListenerOnLongClick((MainActivity) mContext));
                     }
@@ -204,7 +207,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     appItemBeanList.add(appItem);
                 }
                 final int process = i + 1;
-                mHandler.post(() -> dialogLoadList.setProgress(process));
+                mHandler.post(() -> mDialogLoadList.setProgress(process));
             }
             emitter.onNext(appItemBeanList);
             emitter.onComplete();
@@ -226,8 +229,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (mAdapter.getSelectedNum() > 0) {
             extract.setClickable(true);
             share.setClickable(true);
-//                    extract.setOnClickListener(mContext.getApplicationContext());
-//                    share.setOnClickListener(this);
+            extract.setOnClickListener(this);
+            share.setOnClickListener(this);
         } else {
             share.setOnClickListener(null);
             extract.setOnClickListener(null);
@@ -292,8 +295,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (isMultiSelectMode) {
             closeMultiSelectMode();
             Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-            cardView.startAnimation(anim);
-            cardView.setVisibility(View.VISIBLE);
+            mCardView.startAnimation(anim);
+            mCardView.setVisibility(View.VISIBLE);
         }
         SearchFragment searchFragment = SearchFragment.newInstance();
         searchFragment.showFragment(getSupportFragmentManager(), SearchFragment.TAG);
@@ -303,8 +306,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showSearchView();
         });
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
-        cardView.startAnimation(anim);
-        cardView.setVisibility(View.GONE);
+        mCardView.startAnimation(anim);
+        mCardView.setVisibility(View.GONE);
     }
 
     private void clickActionSort() {
@@ -314,7 +317,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     closeMultiSelectMode();
                 }
                 AppItemBean.SortConfig = 0;
-                recyclerView.setAdapter(null);
+                mRecyclerView.setAdapter(null);
                 refreshList(true);
                 dialogSort.cancel();
             } else {
@@ -357,9 +360,78 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (view.getId()) {
             default:
                 break;
-
+            case R.id.text_extract:
+                if (mAdapter == null) {
+                    return;
+                }
+                for (int i = 0; i < mAdapter.getAppList().size(); i++) {
+                    if (mAdapter.getIsSelected()[i]) {
+                        extractApp(new Integer[]{i, 1, 0});
+                    }
+                }
+                break;
+            case R.id.text_share:
+                if (mAdapter == null) {
+                    return;
+                }
+                for (int i = 0; i < mAdapter.getAppList().size(); i++) {
+                    if (mAdapter.getIsSelected()[i]) {
+                        clickShare(i);
+                    }
+                }
+                break;
+            case R.id.fab:
+                if (isSearchMode) {
+                    updateSearchList(keyword);
+                } else {
+                    refreshList(true);
+                }
+                break;
         }
     }
+
+    private void clickShare(int position) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            List<AppItemBean> list = mAdapter.getAppList();
+            String apkPath = list.get(position).getPath();
+            File apk = new File(apkPath);
+            Uri uri = Uri.fromFile(apk);
+            intent.setType("application/vnd.android.package-archive");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share) + list.get(position).getAppName());
+            intent.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share) + list.get(position).getAppName());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(Intent.createChooser(intent, mContext.getResources().getString(R.string.share) + list.get(position).getAppName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void extractApp(Integer[] position) {
+        List<AppItemBean> list;
+        if (mAdapter != null) {
+            list = mAdapter.getAppList();
+            if (list != null) {
+                if (list.size() > 0) {
+                    List<AppItemBean> exportList = new ArrayList<>();
+                    AppItemBean item = new AppItemBean(list.get(position[0]));
+                    if (position[1] == 1) {
+                        item.exportData = true;
+                    }
+                    if (position[2] == 1) {
+                        item.exportObb = true;
+                    }
+                    exportList.add(item);
+                    mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
+                    mThread = new Thread(mCopyFilesUtils);
+                    mThread.start();
+                }
+            }
+        }
+    }
+
 
     private void sortList() {
         if (mAdapter != null && !isSearchMode) {
@@ -369,7 +441,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             findViewById(R.id.showSystemAPP).setEnabled(false);
             Collections.sort(appItemBeanList);
             mAdapter = new AppListAdapter(this, appItemBeanList);
-            recyclerView.setAdapter(mAdapter);
+            mRecyclerView.setAdapter(mAdapter);
             mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
             mAdapter.setLongClickListener(new ListenerOnLongClick(this));
             findViewById(R.id.showSystemAPP).setEnabled(true);
@@ -400,7 +472,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     @Override
                     public void onNext(List<AppItemBean> appItemBeanList) {
                         mAdapter = new AppListAdapter(mContext, appItemBeanList);
-                        recyclerView.setAdapter(mAdapter);
+                        mRecyclerView.setAdapter(mAdapter);
                         mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
                         mAdapter.setLongClickListener(new ListenerOnLongClick((MainActivity) mContext));
                     }
@@ -430,16 +502,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void closeSearchView() {
         isSearchMode = false;
         mAdapter = new AppListAdapter(this, appItemBeanList);
-        pg_search.setVisibility(View.GONE);
-        recyclerView.setAdapter(mAdapter);
+        mProgressBar.setVisibility(View.GONE);
+        mRecyclerView.setAdapter(mAdapter);
         mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
         mAdapter.setLongClickListener(new ListenerOnLongClick(this));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-        cardView.startAnimation(anim);
-        cardView.setVisibility(View.VISIBLE);
+        mCardView.startAnimation(anim);
+        mCardView.setVisibility(View.VISIBLE);
         setMenuVisible(true);
     }
 

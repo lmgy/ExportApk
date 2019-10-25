@@ -33,9 +33,7 @@ import java.util.zip.ZipOutputStream;
  * @date 2019/10/17
  */
 public class CopyFilesUtils implements Runnable {
-
-    private static final String TAG = "CopyFilesUtils";
-
+    
     private Context mContext;
     private List<AppItemBean> appList;
     private String savePath = Constant.PREFERENCE_SAVE_PATH_DEFAULT;
@@ -69,12 +67,109 @@ public class CopyFilesUtils implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        total = getTotalLength();
+    private void extractWithoutData(AppItemBean item){
         long byteTemp = 0;
         long bytesPerSecond = 0;
         long startTime = System.currentTimeMillis();
+        int byteRead;
+        try {
+            String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "apk");
+            this.currentWritePath = writePath;
+            InputStream in = new FileInputStream(item.getPath());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(writePath));
+            String sendPath = writePath;
+            if (sendPath.length() > 90) {
+                sendPath = "..." + sendPath.substring(sendPath.length() - 90);
+            }
+            String currentFile = mContext.getResources().getString(R.string.copytask_apk_current) + sendPath;
+            mHandler.post(() -> fileCopyDialog.setTextAtt(currentFile));
+
+            byte[] buffer = new byte[1024 * 10];
+            while ((byteRead = in.read(buffer)) != -1 && !this.isInterrupted) {
+                out.write(buffer, 0, byteRead);
+                progress += byteRead;
+                bytesPerSecond += byteRead;
+                long endTime = System.currentTimeMillis();
+                if ((endTime - startTime) > 1000) {
+                    startTime = endTime;
+                    long speed = bytesPerSecond;
+                    bytesPerSecond = 0;
+                    fileCopyDialog.setSpeed(speed);
+                }
+
+                if ((progress - byteTemp) > 100 * 1024) {
+                    byteTemp = progress;
+                    Long[] progressInfo = new Long[]{progress, total};
+                    fileCopyDialog.setMax(progressInfo[1]);
+                    fileCopyDialog.setProgress(progressInfo[0]);
+                }
+            }
+            out.flush();
+            in.close();
+            out.close();
+            writePaths.add(writePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                File file = new File(this.currentWritePath);
+                if (file.exists() && !file.isDirectory()) {
+                    file.delete();
+                }
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+            progress += item.getAppSize();
+            String filename = item.getAppName() + " " + item.getVersion();
+
+            isExtractSuccess = false;
+            errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
+        }
+    }
+
+    private void extractWithData(AppItemBean item){
+        try {
+            String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "zip");
+            this.currentWritePath = writePath;
+            ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(new File(writePath))));
+            zos.setComment("Packaged by lmgy");
+            int zipLevel = mContext.getSharedPreferences(Constant.PREFERENCE_NAME, Context.MODE_PRIVATE).getInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT);
+
+            if (zipLevel >= 0 && zipLevel <= 9) {
+                zos.setLevel(zipLevel);
+            }
+
+            writeZip(new File(item.getPath()), "", zos, zipLevel);
+            if (item.exportData) {
+                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName), "Android/data/", zos, zipLevel);
+            }
+            if (item.exportObb) {
+                writeZip(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName), "Android/obb/", zos, zipLevel);
+            }
+            zos.flush();
+            zos.close();
+            writePaths.add(writePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                File file = new File(this.currentWritePath);
+                if (file.exists() && !file.isDirectory()) {
+                    file.delete();
+                }
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+            String filename = item.getAppName() + " " + item.getVersion();
+            isExtractSuccess = false;
+            errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
+        }
+        if (isInterrupted) {
+            new File(this.currentWritePath).delete();
+        }
+    }
+
+    @Override
+    public void run() {
+        total = getTotalLength();
         for (int i = 0; i < this.appList.size(); i++) {
             AppItemBean item = appList.get(i);
             if (!this.isInterrupted) {
@@ -82,109 +177,13 @@ public class CopyFilesUtils implements Runnable {
                 fileCopyDialog.setTitle(mContext.getResources().getString(R.string.activity_main_extracting_title) + (i + 1) + "/" + appList.size() + " " + appList.get(i).appName);
 
                 if ((!item.exportData) && (!item.exportObb)) {
-                    int byteRead;
-                    try {
-                        String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "apk");
-                        this.currentWritePath = writePath;
-                        InputStream in = new FileInputStream(item.getPath());
-                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(writePath));
-                        String sendPath = writePath;
-                        if (sendPath.length() > 90) {
-                            sendPath = "..." + sendPath.substring(sendPath.length() - 90);
-                        }
-                        String currentFile = mContext.getResources().getString(R.string.copytask_apk_current) + sendPath;
-                        mHandler.post(() -> fileCopyDialog.setTextAtt(currentFile));
-
-                        byte[] buffer = new byte[1024 * 10];
-                        while ((byteRead = in.read(buffer)) != -1 && !this.isInterrupted) {
-                            out.write(buffer, 0, byteRead);
-                            progress += byteRead;
-                            bytesPerSecond += byteRead;
-                            long endTime = System.currentTimeMillis();
-                            if ((endTime - startTime) > 1000) {
-                                startTime = endTime;
-                                long speed = bytesPerSecond;
-                                bytesPerSecond = 0;
-                                fileCopyDialog.setSpeed(speed);
-                            }
-
-                            if ((progress - byteTemp) > 100 * 1024) {
-                                byteTemp = progress;
-                                Long[] progressInfo = new Long[]{progress, total};
-                                fileCopyDialog.setMax(progressInfo[1]);
-                                fileCopyDialog.setProgress(progressInfo[0]);
-                            }
-
-                        }
-                        out.flush();
-                        in.close();
-                        out.close();
-                        writePaths.add(writePath);
-                    } catch (Exception e) {
-                        Log.e(TAG, "error 2");
-                        e.printStackTrace();
-                        try {
-                            File file = new File(this.currentWritePath);
-                            if (file.exists() && !file.isDirectory()) {
-                                file.delete();
-                            }
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                        progress += item.getAppSize();
-                        String filename = item.getAppName() + " " + item.getVersion();
-
-                        isExtractSuccess = false;
-                        errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
-                    }
-
+                    extractWithoutData(item);
                 } else {
-                    try {
-                        String writePath = FileUtils.getAbsoluteWritePath(mContext, item, "zip");
-                        this.currentWritePath = writePath;
-                        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(new File(writePath))));
-                        zos.setComment("Packaged by lmgy");
-                        int zipLevel = mContext.getSharedPreferences(Constant.PREFERENCE_NAME, Context.MODE_PRIVATE).getInt(Constant.PREFERENCE_ZIP_COMPRESS_LEVEL, Constant.PREFERENCE_ZIP_COMPRESS_LEVEL_DEFAULT);
-
-                        if (zipLevel >= 0 && zipLevel <= 9) {
-                            zos.setLevel(zipLevel);
-                        }
-
-                        writeZip(new File(item.getPath()), "", zos, zipLevel);
-                        if (item.exportData) {
-                            writeZip(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.packageName), "Android/data/", zos, zipLevel);
-                        }
-                        if (item.exportObb) {
-                            writeZip(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.packageName), "Android/obb/", zos, zipLevel);
-                        }
-                        zos.flush();
-                        zos.close();
-                        writePaths.add(writePath);
-                    } catch (Exception e) {
-                        Log.e(TAG, "error 3");
-                        e.printStackTrace();
-                        try {
-                            File file = new File(this.currentWritePath);
-                            if (file.exists() && !file.isDirectory()) {
-                                file.delete();
-                            }
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                        String filename = item.getAppName() + " " + item.getVersion();
-                        Log.e(TAG, "run: 2");
-                        isExtractSuccess = false;
-                        errorMessage += filename + "\nError Message:" + e.toString() + "\n\n";
-
-                    }
-                    if (isInterrupted) {
-                        new File(this.currentWritePath).delete();
-                    }
+                    extractWithData(item);
                 }
             } else {
                 break;
             }
-
         }
 
         if (!this.isInterrupted) {
@@ -207,25 +206,25 @@ public class CopyFilesUtils implements Runnable {
             isExtractSuccess = true;
             errorMessage = "";
 
-            List<String> paths = writePaths;
-            Intent i = new Intent();
-            i.setType("application/x-zip-compressed");
-            if (paths.size() == 1) {
-                i.setAction(Intent.ACTION_SEND);
-                Uri uri = Uri.fromFile(new File(paths.get(0)));
-                i.putExtra(Intent.EXTRA_STREAM, uri);
-            } else {
-                i.setAction(Intent.ACTION_SEND_MULTIPLE);
-                ArrayList<Uri> uris = new ArrayList<>();
-                for (int n = 0; n < paths.size(); n++) {
-                    uris.add(Uri.fromFile(new File(paths.get(n))));
-                }
-                i.putExtra(Intent.EXTRA_STREAM, uris);
-            }
-            i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
-            i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
+//            List<String> paths = writePaths;
+//            Intent i = new Intent();
+//            i.setType("application/x-zip-compressed");
+//            if (paths.size() == 1) {
+//                i.setAction(Intent.ACTION_SEND);
+//                Uri uri = Uri.fromFile(new File(paths.get(0)));
+//                i.putExtra(Intent.EXTRA_STREAM, uri);
+//            } else {
+//                i.setAction(Intent.ACTION_SEND_MULTIPLE);
+//                ArrayList<Uri> uris = new ArrayList<>();
+//                for (int n = 0; n < paths.size(); n++) {
+//                    uris.add(Uri.fromFile(new File(paths.get(n))));
+//                }
+//                i.putExtra(Intent.EXTRA_STREAM, uris);
+//            }
+//            i.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share));
+//            i.putExtra(Intent.EXTRA_TEXT, mContext.getResources().getString(R.string.share));
+//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            mContext.startActivity(Intent.createChooser(i, mContext.getResources().getString(R.string.share)));
 
         }
     }
@@ -319,19 +318,6 @@ public class CopyFilesUtils implements Runnable {
             }
         }
         return total;
-    }
-
-    public void setInterrupted() {
-        this.isInterrupted = true;
-        try {
-            File file = new File(this.currentWritePath);
-            if (file.exists() && !file.isDirectory()) {
-                file.delete();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     public static CRC32 getCRC32FromFile(File file) throws Exception {
