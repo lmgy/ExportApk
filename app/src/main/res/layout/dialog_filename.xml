@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:padding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btn_cancel"
+                android:src="@drawable/ic_clear_black_24dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_toStartOf="@+id/btn_confirm"
+                android:background="@color/transparent"
+                android:gravity="center_vertical"/>
+
+            <ImageButton
+                android:src="@drawable/ic_done_black_24dp"
+                android:id="@+id/btn_confirm"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center_vertical"
+                android:background="@color/transparent"/>
+        </RelativeLayout>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
             android:text="@string/dialog_filename_apk_att"
             android:textColor="@color/color_att"
             android:textSize="15sp" />
@@ -72,7 +97,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
             android:text="@string/dialog_filename_zip_att"
             android:textColor="@color/color_att"
             android:textSize="15sp" />
@@ -227,4 +251,4 @@
 
     </LinearLayout>
 
-</ScrollView>
+</RelativeLayout>
