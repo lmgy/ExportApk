@@ -2,7 +2,6 @@ package com.lmgy.exportapk.ui.activity;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,19 +49,14 @@ public class FolderSelectActivity extends BaseActivity {
 
     @BindView(R.id.folderselect_filelist)
     ListView mListView;
-
     @BindView(R.id.folderselect_swiperefreshlayout)
     SwipeRefreshLayout mSwipeRefreshLayout;
-
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
     @BindView(R.id.folderselect_spinner)
     Spinner mSpinner;
-
     @BindView(R.id.folderselector_facearea)
     RelativeLayout mRlFace;
-
     @BindView(R.id.folderselector_refresharea)
     RelativeLayout mRlLoad;
 
@@ -127,7 +121,6 @@ public class FolderSelectActivity extends BaseActivity {
 
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Log.d("Spinner", "position is " + position);
                     try {
                         if (currentSelectedStoragePath.toLowerCase(Locale.getDefault()).trim().equals(((String) mSpinner.getSelectedItem()).toLowerCase(Locale.getDefault()).trim())) {
                             mPath = new File((String) mSpinner.getSelectedItem());
@@ -176,7 +169,7 @@ public class FolderSelectActivity extends BaseActivity {
                 .create();
         newFolder.show();
 
-        final EditText edittext = dialogView.findViewById(R.id.dialog_newfolder_edittext);
+        EditText edittext = dialogView.findViewById(R.id.dialog_newfolder_edittext);
         newFolder.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
                 String folderName = edittext.getText().toString().trim();
@@ -380,5 +373,4 @@ public class FolderSelectActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
-
 }

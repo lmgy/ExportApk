@@ -14,10 +14,6 @@
     app:cardUseCompatPadding="true">
 
     <include
-        android:id="@+id/main_msg_view"
-        layout="@layout/content_main_msg"/>
-
-    <include
         android:id="@+id/choice_app_view"
         android:visibility="gone"
         layout="@layout/content_choice_app"/>

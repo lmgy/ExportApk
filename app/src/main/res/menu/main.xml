@@ -14,6 +14,12 @@
         android:icon="@drawable/ic_menu_sort"
         app:showAsAction="ifRoom"
         android:title="@string/action_sort"/>
+
+    <item
+        android:id="@+id/action_showsysapp"
+        android:orderInCategory="2"
+        app:showAsAction="never"
+        android:title="@string/text_showsysapp"/>
     
      <item
         android:id="@+id/action_settings"

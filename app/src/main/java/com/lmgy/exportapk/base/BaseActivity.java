@@ -14,7 +14,6 @@ import butterknife.Unbinder;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-
     private Unbinder unbinder;
 
     @Override
@@ -33,8 +32,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 设置布局
-     *
-     * @return
      */
     public abstract int getLayoutId();
 

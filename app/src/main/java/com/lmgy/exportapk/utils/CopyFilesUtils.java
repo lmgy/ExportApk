@@ -50,9 +50,9 @@ public class CopyFilesUtils implements Runnable {
 
 
     public CopyFilesUtils(List<AppItemBean> list, Context context) {
-        appList = list;
+        this.appList = list;
         this.mContext = context;
-        fileCopyDialog = new FileCopyDialog(mContext);
+        this.fileCopyDialog = new FileCopyDialog(mContext);
         this.isInterrupted = false;
         File initialPath = new File(SpUtils.getSavePath());
         if (initialPath.exists() && !initialPath.isDirectory()) {

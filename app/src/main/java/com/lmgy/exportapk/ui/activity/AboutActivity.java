@@ -29,13 +29,10 @@ public class AboutActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
     @BindView(R.id.toolbar_layout)
     CollapsingToolbarLayout mToolbarLayout;
-
     @BindView(R.id.app_bar)
     AppBarLayout mAppBarLayout;
-
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
@@ -77,5 +74,4 @@ public class AboutActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

@@ -1,7 +1,5 @@
 package com.lmgy.exportapk.ui.activity;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -12,13 +10,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +32,7 @@ import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
 import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.listener.DialogClick;
-import com.lmgy.exportapk.listener.ListenerMultiSelectMode;
 import com.lmgy.exportapk.listener.ListenerNormalMode;
-import com.lmgy.exportapk.listener.ListenerOnLongClick;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.SearchUtils;
@@ -64,7 +58,9 @@ import io.reactivex.schedulers.Schedulers;
  * @author lmgy
  * @date 2019/10/13
  */
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,
+        AppListAdapter.OnItemClickListener,
+        AppListAdapter.OnLongClickListener {
 
     @BindView(R.id.rv_main)
     RecyclerView mRecyclerView;
@@ -76,8 +72,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     CardView mCardView;
     @BindView(R.id.progressbar_search)
     ProgressBar mProgressBar;
-    @BindView(R.id.showSystemAPP)
-    CheckBox mCheckBox;
     @BindView(R.id.text_selectall)
     TextView mSelectAll;
     @BindView(R.id.text_deselectall)
@@ -86,10 +80,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     TextView mExtract;
     @BindView(R.id.text_share)
     TextView mShare;
+    @BindView(R.id.choice_app_view)
+    View multiSelectArea;
 
-    private boolean showSystemApp = false;
-    private boolean isMultiSelectMode = false;
-    private boolean isSearchMode = false;
+    private boolean showSystemApp;
+    private boolean isMultiSelectMode;
+    private boolean isSearchMode;
     private AppListAdapter mAdapter;
     private Menu menu;
     private String keyword;
@@ -121,23 +117,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initView() {
-        findViewById(R.id.choice_app_view).setVisibility(View.GONE);
-        findViewById(R.id.main_msg_view).setVisibility(View.VISIBLE);
-
+        multiSelectArea.setVisibility(View.GONE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-
         setSupportActionBar(mToolbar);
         mFab.setOnClickListener(this);
-
-        mCheckBox.setOnCheckedChangeListener((button, isChecked) -> {
-            if (isMultiSelectMode) {
-                closeMultiSelectMode();
-            }
-            showSystemApp = isChecked;
-            refreshList();
-        });
     }
 
 
@@ -170,7 +155,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void onComplete() {
                         mDialogLoadList.cancel();
                         mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
-                        mAdapter.setLongClickListener(new ListenerOnLongClick((MainActivity) mContext));
+                        mAdapter.setLongClickListener((MainActivity) mContext);
                     }
                 });
     }
@@ -258,11 +243,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             updateMultiSelectMode(-1);
         });
 
-        mAdapter.setItemClickListener(new ListenerMultiSelectMode(this));
-        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
-
-        View multiSelectArea = findViewById(R.id.choice_app_view);
-        findViewById(R.id.main_msg_view).setVisibility(View.GONE);
+        mAdapter.setItemClickListener(this);
+        mAdapter.setLongClickListener(this);
 
         Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.anim_multiselectarea_entry);
         multiSelectArea.startAnimation(anim);
@@ -349,6 +331,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.action_sort:
                 clickActionSort();
+                break;
+            case R.id.action_showsysapp:
+                if (isMultiSelectMode) {
+                    closeMultiSelectMode();
+                }
+                showSystemApp = !showSystemApp;
+                if (showSystemApp) {
+                    menu.getItem(2).setTitle(getString(R.string.text_hidesysapp));
+                } else {
+                    menu.getItem(2).setTitle(getString(R.string.text_showsysapp));
+                }
+                refreshList();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -439,7 +433,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mAdapter = new AppListAdapter(this, appItemBeanList);
             mRecyclerView.setAdapter(mAdapter);
             mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
-            mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+            mAdapter.setLongClickListener(this);
         }
     }
 
@@ -469,7 +463,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         mAdapter = new AppListAdapter(mContext, appItemBeanList);
                         mRecyclerView.setAdapter(mAdapter);
                         mAdapter.setItemClickListener(new ListenerNormalMode(mContext, mAdapter));
-                        mAdapter.setLongClickListener(new ListenerOnLongClick((MainActivity) mContext));
+                        mAdapter.setLongClickListener((MainActivity) mContext);
                     }
 
                     @Override
@@ -499,7 +493,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mProgressBar.setVisibility(View.GONE);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+        mAdapter.setLongClickListener(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
@@ -525,36 +519,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mAdapter.cancelMutiSelectMode();
         mAdapter.setItemClickListener(new ListenerNormalMode(this, mAdapter));
-        mAdapter.setLongClickListener(new ListenerOnLongClick(this));
+        mAdapter.setLongClickListener(this);
 
         Animation animExit = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_exit);
-        Animation animEntry = AnimationUtils.loadAnimation(this, R.anim.anim_multiselectarea_entry);
-
-        View multiSelectArea = findViewById(R.id.choice_app_view);
-        View mainMsgView = findViewById(R.id.main_msg_view);
 
         multiSelectArea.startAnimation(animExit);
         multiSelectArea.setVisibility(View.GONE);
-
-        mainMsgView.startAnimation(animEntry);
-        mainMsgView.setVisibility(View.VISIBLE);
 
         if (!isSearchMode) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
 
-    @SuppressLint("InflateParams")
-    private void clickActionAbout() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_about, null);
-        AlertDialog dialogAbout = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.app_name))
-                .setIcon(R.mipmap.ic_launcher_round)
-                .setCancelable(true)
-                .setView(dialogView)
-                .setPositiveButton(getResources().getString(R.string.dialog_button_positive), (dialogInterface, i) -> {
-                }).create();
-        dialogAbout.show();
+    @Override
+    public void onItemClick(int position) {
+        updateMultiSelectMode(position);
     }
 
+    @Override
+    public boolean onLongClick(int position) {
+        startMultiSelectMode(position);
+        return false;
+    }
 }

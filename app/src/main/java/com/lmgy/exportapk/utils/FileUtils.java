@@ -1,7 +1,5 @@
 package com.lmgy.exportapk.utils;
 
-import android.content.Context;
-
 import com.lmgy.exportapk.bean.AppItemBean;
 import com.lmgy.exportapk.config.Constant;
 
@@ -39,23 +37,9 @@ public class FileUtils {
         return 0;
     }
 
-
     public static long getFileSize(String filePath) {
         return filePath != null ? getFileOrFolderSize(new File(filePath)) : 0;
     }
-
-    public static long getFilesSize(String[] filePaths) {
-        if (filePaths == null || filePaths.length == 0) {
-            return 0;
-        } else {
-            long total = 0;
-            for (String filepath : filePaths) {
-                total += getFileSize(filepath);
-            }
-            return total;
-        }
-    }
-
 
     public static String getDuplicateFileInfo(List<AppItemBean> items, String extension) {
         try {
@@ -100,5 +84,4 @@ public class FileUtils {
         }
         return "";
     }
-
 }

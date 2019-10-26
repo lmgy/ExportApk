@@ -148,12 +148,12 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
                 return;
             }
 
-            String apk_replaced_variables = editApk.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
-            String zip_replaced_variables = editZip.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
-            if (apk_replaced_variables.contains("?") || apk_replaced_variables.contains("\\") || apk_replaced_variables.contains("/") || apk_replaced_variables.contains(":") || apk_replaced_variables.contains("*") || apk_replaced_variables.contains("\"")
-                    || apk_replaced_variables.contains("<") || apk_replaced_variables.contains(">") || apk_replaced_variables.contains("|")
-                    || zip_replaced_variables.contains("?") || zip_replaced_variables.contains("\\") || zip_replaced_variables.contains("/") || zip_replaced_variables.contains(":") || zip_replaced_variables.contains("*") || zip_replaced_variables.contains("\"")
-                    || zip_replaced_variables.contains("<") || zip_replaced_variables.contains(">") || zip_replaced_variables.contains("|")) {
+            String apkReplacedVariables = editApk.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
+            String zipReplacedVariables = editZip.getText().toString().replace(Constant.FONT_APP_NAME, "").replace(Constant.FONT_APP_PACKAGE_NAME, "").replace(Constant.FONT_APP_VERSIONCODE, "").replace(Constant.FONT_APP_VERSIONNAME, "");
+            if (apkReplacedVariables.contains("?") || apkReplacedVariables.contains("\\") || apkReplacedVariables.contains("/") || apkReplacedVariables.contains(":") || apkReplacedVariables.contains("*") || apkReplacedVariables.contains("\"")
+                    || apkReplacedVariables.contains("<") || apkReplacedVariables.contains(">") || apkReplacedVariables.contains("|")
+                    || zipReplacedVariables.contains("?") || zipReplacedVariables.contains("\\") || zipReplacedVariables.contains("/") || zipReplacedVariables.contains(":") || zipReplacedVariables.contains("*") || zipReplacedVariables.contains("\"")
+                    || zipReplacedVariables.contains("<") || zipReplacedVariables.contains(">") || zipReplacedVariables.contains("|")) {
                 Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_invalid_foldername), Toast.LENGTH_SHORT).show();
             }
             SpUtils.setFontApk(editApk.getText().toString());

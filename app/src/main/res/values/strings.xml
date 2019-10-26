@@ -84,6 +84,7 @@
     <string name="hint_filename_zip">输入zip命名规则</string>
     <string name="text_appinst">点击相应条目来导出应用</string>
     <string name="text_showsysapp">显示系统应用</string>
+    <string name="text_hidesysapp">隐藏系统应用</string>
     <string name="text_nofolder">此目录没有子文件夹</string>
     <string name="text_loading">正在加载</string>
     <string name="hint_newfolder">输入文件夹名称</string>

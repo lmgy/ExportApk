@@ -17,7 +17,6 @@ import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 import com.lmgy.exportapk.widget.AppDetailDialog;
-import com.lmgy.exportapk.widget.FileCopyDialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,11 +36,6 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
 
     private Context mContext;
     private AppListAdapter mAdapter;
-    private CopyFilesUtils mCopyFilesUtils;
-    private FileCopyDialog mFileCopyDialog;
-    private Thread mThread;
-    private List<AppItemBean> extractMultiList;
-    private AlertDialog dialogWait;
 
     public ListenerNormalMode(Context context, AppListAdapter adapter) {
         this.mContext = context;
@@ -131,12 +125,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                     .setTitle(mContext.getResources().getString(R.string.activity_main_duplicate_title))
                     .setCancelable(true)
                     .setMessage(mContext.getResources().getString(R.string.activity_main_duplicate_message) + "\n\n" + duplicate)
-                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> {
-                        extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
-                    })
-                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), (dialog, which) -> {
-
-                    })
+                    .setPositiveButton(mContext.getResources().getString(R.string.dialog_button_positive), (dialog, which) -> extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0}))
+                    .setNegativeButton(mContext.getResources().getString(R.string.dialog_button_negative), null)
                     .show();
         } else {
             extractApp(new Integer[]{position, data ? 1 : 0, obb ? 1 : 0});
@@ -176,8 +166,8 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
                         item.setExportObb(true);
                     }
                     exportList.add(item);
-                    mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
-                    mThread = new Thread(mCopyFilesUtils);
+                    CopyFilesUtils mCopyFilesUtils = new CopyFilesUtils(exportList, mContext);
+                    Thread mThread = new Thread(mCopyFilesUtils);
 //                    mFileCopyDialog = new FileCopyDialog(mContext);
 //                    mFileCopyDialog.setCancelable(false);
 //                    mFileCopyDialog.setCanceledOnTouchOutside(false);
@@ -207,14 +197,12 @@ public class ListenerNormalMode implements AppListAdapter.OnItemClickListener {
     }
 
     private Observable<List<Long>> calculateSize(AppItemBean item) {
-        Observable<List<Long>> observable = Observable.create(emitter -> {
+        return Observable.create(emitter -> {
             List<Long> list = new ArrayList<>();
             list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/data/" + item.getPackageName())));
             list.add(FileUtils.getFileOrFolderSize(new File(StorageUtils.getMainStoragePath() + "/android/obb/" + item.getPackageName())));
             emitter.onNext(list);
             emitter.onComplete();
         });
-        return observable;
     }
-
 }
