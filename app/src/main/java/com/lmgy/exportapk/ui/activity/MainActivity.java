@@ -27,6 +27,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.hjq.permissions.OnPermission;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.AppListAdapter;
 import com.lmgy.exportapk.base.BaseActivity;
@@ -36,6 +39,7 @@ import com.lmgy.exportapk.listener.ListenerNormalMode;
 import com.lmgy.exportapk.utils.CopyFilesUtils;
 import com.lmgy.exportapk.utils.FileUtils;
 import com.lmgy.exportapk.utils.SearchUtils;
+import com.lmgy.exportapk.utils.ToastUtils;
 import com.lmgy.exportapk.widget.LoadListDialog;
 import com.lmgy.exportapk.widget.SortDialog;
 import com.wyt.searchbox.SearchFragment;
@@ -101,15 +105,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         mHandler = new Handler(getMainLooper());
         mContext = this;
 
+        XXPermissions.with(this)
+                .constantRequest()
+                .permission(Permission.Group.STORAGE)
+                .request(new OnPermission() {
+                    @Override
+                    public void hasPermission(List<String> granted, boolean isAll) {
+                        mDialogLoadList = new LoadListDialog(mContext);
+                        mDialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
+                        mDialogLoadList.setCancelable(false);
+                        mDialogLoadList.setCanceledOnTouchOutside(false);
+                        mDialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
 
+                        refreshList();
+                    }
 
-        mDialogLoadList = new LoadListDialog(this);
-        mDialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
-        mDialogLoadList.setCancelable(false);
-        mDialogLoadList.setCanceledOnTouchOutside(false);
-        mDialogLoadList.setMax(getPackageManager().getInstalledPackages(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT).size());
-
-        refreshList();
+                    @Override
+                    public void noPermission(List<String> denied, boolean quick) {
+                        if (quick) {
+                            ToastUtils.show("被永久拒绝授权，请手动授予权限");
+                            XXPermissions.gotoPermissionSettings(MainActivity.this);
+                        } else {
+                            ToastUtils.show("获取权限失败");
+                        }
+                    }
+                });
     }
 
     @Override
