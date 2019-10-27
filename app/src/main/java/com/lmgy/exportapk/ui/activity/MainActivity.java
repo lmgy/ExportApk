@@ -101,6 +101,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         mHandler = new Handler(getMainLooper());
         mContext = this;
 
+
+
         mDialogLoadList = new LoadListDialog(this);
         mDialogLoadList.setTitle(getResources().getString(R.string.activity_main_loading));
         mDialogLoadList.setCancelable(false);

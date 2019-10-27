@@ -1,6 +1,8 @@
 package com.lmgy.exportapk.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +41,11 @@ public class AboutListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) holder;
         recyclerViewHolder.tvName.setText(aboutBeanList.get(position).getName());
         recyclerViewHolder.tvPath.setText(aboutBeanList.get(position).getPath());
+        recyclerViewHolder.itemView.setOnClickListener(view -> {
+            Uri uri = Uri.parse(aboutBeanList.get(position).getPath());
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            mContext.startActivity(intent);
+        });
     }
 
     @Override
