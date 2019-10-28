@@ -1,4 +1,4 @@
-package com.lmgy.exportapk.ui.activity;
+package com.lmgy.exportapk.mvp.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,13 +14,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.SettingsListAdapter;
-import com.lmgy.exportapk.base.BaseActivity;
+import com.lmgy.exportapk.base.BaseMvpActivity;
 import com.lmgy.exportapk.bean.SettingsBean;
 import com.lmgy.exportapk.config.Constant;
+import com.lmgy.exportapk.mvp.contract.SettingsContract;
+import com.lmgy.exportapk.mvp.presenter.SettingsPresenter;
 import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.widget.ExportRuleDialog;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,7 +31,8 @@ import butterknife.BindView;
  * @author lmgy
  * @date 2019/10/18
  */
-public class SettingsActivity extends BaseActivity implements AdapterView.OnItemClickListener {
+public class SettingsActivity extends BaseMvpActivity<SettingsPresenter> implements SettingsContract.View,
+        AdapterView.OnItemClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -52,10 +54,12 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
 
     @Override
     public void initView() {
+        mPresenter = new SettingsPresenter();
+        mPresenter.attachView(this);
         setSupportActionBar(mToolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         mToolbar.setTitle("设置");
-        initData();
+        mPresenter.loadSettingList();
     }
 
     @Override
@@ -65,16 +69,6 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initData() {
-        List<SettingsBean> settingsBeanList = new ArrayList<>();
-        settingsBeanList.add(new SettingsBean("导出路径", R.drawable.ic_settings_export));
-        settingsBeanList.add(new SettingsBean("导出规则", R.drawable.ic_settings_rule));
-        settingsBeanList.add(new SettingsBean("关于", R.drawable.ic_settings_about));
-        SettingsListAdapter adapter = new SettingsListAdapter(this, R.layout.layout_settings_card, settingsBeanList);
-        mListView.setAdapter(adapter);
-        mListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -117,5 +111,12 @@ public class SettingsActivity extends BaseActivity implements AdapterView.OnItem
             exportRuleDialog.dismiss();
         });
         exportRuleDialog.show();
+    }
+
+    @Override
+    public void setAdapter(List<SettingsBean> settingsBeanList) {
+        SettingsListAdapter adapter = new SettingsListAdapter(this, R.layout.layout_settings_card, settingsBeanList);
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(this);
     }
 }

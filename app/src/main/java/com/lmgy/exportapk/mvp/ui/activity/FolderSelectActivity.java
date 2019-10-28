@@ -1,7 +1,6 @@
-package com.lmgy.exportapk.ui.activity;
+package com.lmgy.exportapk.mvp.ui.activity;
 
 import android.app.AlertDialog;
-import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,9 +20,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.lmgy.exportapk.R;
 import com.lmgy.exportapk.adapter.FileListAdapter;
-import com.lmgy.exportapk.base.BaseActivity;
+import com.lmgy.exportapk.base.BaseMvpActivity;
 import com.lmgy.exportapk.bean.FileItemBean;
 import com.lmgy.exportapk.config.Constant;
+import com.lmgy.exportapk.mvp.contract.FolderSelectContract;
+import com.lmgy.exportapk.mvp.presenter.FolderSelectPresenter;
 import com.lmgy.exportapk.utils.SpUtils;
 import com.lmgy.exportapk.utils.StorageUtils;
 
@@ -35,17 +36,12 @@ import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author lmgy
  * @date 2019/10/19
  */
-public class FolderSelectActivity extends BaseActivity {
+public class FolderSelectActivity extends BaseMvpActivity<FolderSelectPresenter> implements FolderSelectContract.View {
 
     @BindView(R.id.folderselect_filelist)
     ListView mListView;
@@ -59,15 +55,12 @@ public class FolderSelectActivity extends BaseActivity {
     RelativeLayout mRlFace;
     @BindView(R.id.folderselector_refresharea)
     RelativeLayout mRlLoad;
+    @BindView(R.id.folderselector_pathname)
+    TextView pathName;
 
     private File mPath;
     private FileListAdapter mAdapter;
     private List<FileItemBean> mFileList;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public int getLayoutId() {
@@ -76,6 +69,8 @@ public class FolderSelectActivity extends BaseActivity {
 
     @Override
     public void initView() {
+        mPresenter = new FolderSelectPresenter();
+        mPresenter.attachView(this);
         setSupportActionBar(mToolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -92,13 +87,13 @@ public class FolderSelectActivity extends BaseActivity {
         mAdapter = new FileListAdapter(mFileList, this);
         final String currentSelectedStoragePath = StorageUtils.getMainStoragePath();
         try {
-            List<String> storages = StorageUtils.getAvailableStoragePaths();
+            List<String> storage = StorageUtils.getAvailableStoragePaths();
             mSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_spinner_text,
-                    R.id.item_storage_text, storages));
+                    R.id.item_storage_text, storage));
             OUT:
-            for (int i = 0; i < storages.size(); i++) {
+            for (int i = 0; i < storage.size(); i++) {
                 try {
-                    if (mPath.getAbsolutePath().toLowerCase(Locale.getDefault()).trim().equals(storages.get(i)
+                    if (mPath.getAbsolutePath().toLowerCase(Locale.getDefault()).trim().equals(storage.get(i)
                             .toLowerCase(Locale.getDefault()).trim())) {
                         mSpinner.setSelection(i);
                         break;
@@ -106,19 +101,17 @@ public class FolderSelectActivity extends BaseActivity {
                         File file = new File(mPath.getAbsolutePath());
                         while ((file = file.getParentFile()) != null) {
                             if (file.getAbsolutePath().toLowerCase(Locale.getDefault()).trim()
-                                    .equals(storages.get(i).toLowerCase(Locale.getDefault()).trim())) {
+                                    .equals(storage.get(i).toLowerCase(Locale.getDefault()).trim())) {
                                 mSpinner.setSelection(i);
                                 break OUT;
                             }
                         }
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     try {
@@ -128,7 +121,6 @@ public class FolderSelectActivity extends BaseActivity {
                         refreshList(true);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -139,20 +131,14 @@ public class FolderSelectActivity extends BaseActivity {
             });
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
         try {
-            if (!mPath.exists()) {
-                if (!mPath.mkdirs()) {
-                    Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_initial_failed), Toast.LENGTH_SHORT).show();
-                }
+            if (!mPath.exists() && !mPath.mkdirs()) {
+                Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_initial_failed), Toast.LENGTH_SHORT).show();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
-
         refreshList(true);
         mSwipeRefreshLayout.setOnRefreshListener(() -> refreshList(false));
     }
@@ -168,7 +154,6 @@ public class FolderSelectActivity extends BaseActivity {
                 .setNegativeButton(getResources().getString(R.string.dialog_button_negative), null)
                 .create();
         newFolder.show();
-
         EditText edittext = dialogView.findViewById(R.id.dialog_newfolder_edittext);
         newFolder.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
@@ -189,13 +174,10 @@ public class FolderSelectActivity extends BaseActivity {
                     } else {
                         Toast.makeText(this, "Make Dirs error", Toast.LENGTH_SHORT).show();
                     }
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
             }
-
         });
         newFolder.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> newFolder.cancel());
     }
@@ -210,8 +192,7 @@ public class FolderSelectActivity extends BaseActivity {
                 break;
             case R.id.folderselect_action_confirm:
                 String savePath = mPath.getAbsolutePath();
-                SpUtils.setSavePath(savePath);
-                Toast.makeText(this, getResources().getString(R.string.activity_folder_selector_saved_font) + savePath, Toast.LENGTH_SHORT).show();
+                mPresenter.savePath(this, savePath);
                 finish();
                 break;
             case R.id.folderselect_action_cancel:
@@ -219,28 +200,19 @@ public class FolderSelectActivity extends BaseActivity {
                 break;
             case R.id.folderselect_action_sort_ascending:
                 FileItemBean.SortConfig = 1;
-                if (mFileList != null) {
-                    Collections.sort(mFileList);
-                }
-                if (mAdapter != null) {
-                    mAdapter.setSelected(-1);
-                }
+                Collections.sort(mFileList);
+                mAdapter.setSelected(-1);
                 break;
             case R.id.folderselect_action_sort_descending:
                 FileItemBean.SortConfig = 2;
-                if (mFileList != null) {
-                    Collections.sort(mFileList);
-                }
-                if (mAdapter != null) {
-                    mAdapter.setSelected(-1);
-                }
+                Collections.sort(mFileList);
+                mAdapter.setSelected(-1);
                 break;
             case R.id.folderselect_action_newfolder:
                 clickActionNewFolder();
                 break;
             case R.id.folderselect_action_reset:
-                SpUtils.setSavePath(Constant.PREFERENCE_SAVE_PATH_DEFAULT);
-                Toast.makeText(this, "默认路径: " + Constant.PREFERENCE_SAVE_PATH_DEFAULT, Toast.LENGTH_SHORT).show();
+                mPresenter.savePath(this, Constant.PREFERENCE_SAVE_PATH_DEFAULT);
                 finish();
                 break;
         }
@@ -266,104 +238,23 @@ public class FolderSelectActivity extends BaseActivity {
         if (att.length() > 50) {
             att = "/..." + att.substring(att.length() - 50);
         }
-        ((TextView) findViewById(R.id.folderselector_pathname)).setText(getResources().getString(R.string.activity_folder_selector_current) + att);
+        pathName.setText(getResources().getString(R.string.activity_folder_selector_current) + att);
     }
 
+    @Override
     public void refreshList(boolean isShowProgressBar) {
-        if (mListView != null) {
-            mListView.setAdapter(null);
-        }
-        if (mRlFace != null) {
-            mRlFace.setVisibility(View.GONE);
-        }
-        if (mRlLoad != null && isShowProgressBar) {
+        mListView.setAdapter(null);
+        mRlFace.setVisibility(View.GONE);
+        if (isShowProgressBar) {
             mRlLoad.setVisibility(View.VISIBLE);
         }
-
-        getObservable().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<FileItemBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(List<FileItemBean> fileItemBeans) {
-                        mFileList = fileItemBeans;
-                        setInfoAtt(mPath.getAbsolutePath());
-                        mAdapter = new FileListAdapter(mFileList, getApplicationContext());
-                        if (mListView != null) {
-                            mListView.setAdapter(mAdapter);
-                            mListView.setOnItemClickListener((arg0, arg1, arg2, arg3) -> {
-                                mPath = mFileList.get(arg2).getFile();
-                                setInfoAtt(mPath.getAbsolutePath());
-                                refreshList(true);
-                            });
-
-                            mAdapter.setOnRadioButtonClickListener(position -> {
-                                mPath = mFileList.get(position).getFile();
-                                setInfoAtt(mPath.getAbsolutePath());
-                                mAdapter.setSelected(position);
-                            });
-
-                            if (mRlFace != null) {
-                                if (mFileList.size() <= 0) {
-                                    mRlFace.setVisibility(View.VISIBLE);
-                                } else {
-                                    mRlFace.setVisibility(View.GONE);
-                                }
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        if (mRlLoad != null) {
-                            mRlLoad.setVisibility(View.GONE);
-                        }
-                        if (mSwipeRefreshLayout != null) {
-                            mSwipeRefreshLayout.setRefreshing(false);
-                        }
-                    }
-                });
-    }
-
-    private Observable<List<FileItemBean>> getObservable() {
-        return Observable.create(emitter -> {
-            List<FileItemBean> fileList = new ArrayList<>();
-            try {
-                if (mPath.isDirectory()) {
-                    File[] files = mPath.listFiles();
-                    if (files != null && files.length > 0) {
-                        for (File file : files) {
-                            if (file.isDirectory() && file.getName().indexOf(".") != 0) {
-                                FileItemBean fileItem = new FileItemBean(file);
-                                fileList.add(fileItem);
-                            }
-                        }
-                        Collections.sort(fileList);
-                    }
-                }
-                emitter.onNext(fileList);
-                emitter.onComplete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        mPresenter.loadFileList(mPath);
     }
 
     public void backToParent() {
         try {
             File parent = mPath.getParentFile();
-            if (parent == null || parent.getAbsolutePath().trim().length() < ((String) ((Spinner) findViewById(R.id.folderselect_spinner))
-                    .getSelectedItem()).trim().length()) {
+            if (parent == null || parent.getAbsolutePath().trim().length() < ((String) mSpinner.getSelectedItem()).trim().length()) {
                 finish();
             } else {
                 mPath = parent;
@@ -372,5 +263,32 @@ public class FolderSelectActivity extends BaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setFileData(List<FileItemBean> fileItemBeans) {
+        mFileList = fileItemBeans;
+        setInfoAtt(mPath.getAbsolutePath());
+        mAdapter = new FileListAdapter(mFileList, getApplicationContext());
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener((arg0, arg1, arg2, arg3) -> {
+            mPath = mFileList.get(arg2).getFile();
+            setInfoAtt(mPath.getAbsolutePath());
+            refreshList(true);
+        });
+
+        mAdapter.setOnRadioButtonClickListener(position -> {
+            mPath = mFileList.get(position).getFile();
+            setInfoAtt(mPath.getAbsolutePath());
+            mAdapter.setSelected(position);
+        });
+
+        if (mFileList.size() <= 0) {
+            mRlFace.setVisibility(View.VISIBLE);
+        } else {
+            mRlFace.setVisibility(View.GONE);
+        }
+        mRlLoad.setVisibility(View.GONE);
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 }

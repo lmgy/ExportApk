@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.activity.FolderSelectActivity">
+    tools:context=".mvp.ui.activity.FolderSelectActivity">
 
     <item
         android:id="@+id/folderselect_action_confirm"

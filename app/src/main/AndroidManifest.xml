@@ -14,16 +14,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activity.FolderSelectActivity"
+            android:name=".mvp.ui.activity.FolderSelectActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.activity.SettingsActivity"
+            android:name=".mvp.ui.activity.SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.activity.AboutActivity"
+            android:name=".mvp.ui.activity.AboutActivity"
             android:theme="@style/TransparentSystemUITheme" />
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".mvp.ui.activity.MainActivity"
             android:theme="@style/TransparentSystemUITheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
